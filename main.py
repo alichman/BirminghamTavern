@@ -43,4 +43,4 @@ class Lad:
             return False
 
 
-A = Lad("Bobby", 0)
+A = Lad("Bobby", 1)
