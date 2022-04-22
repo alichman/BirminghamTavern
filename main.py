@@ -23,7 +23,7 @@ class Lad:
         for Line in range(len(self.dataLines)-1):
             self.dataLines[Line] = self.dataLines[Line][:-2]
         self.image = self.dataLines[0]
-        self.Compliments = [self.dataLines[1], self.dataLines[2]]
+        self.Compliments = [' '.split(self.dataLines[1]), ' '.split(self.dataLines[2])]
         self.Lines = [self.dataLines[i] for i in range(3, 7)]
         file.close()
 
@@ -33,10 +33,14 @@ class Lad:
     def getCompliment(self,subject):
         if subject in self.Compliments[0]:
             self.fMeter += round(30 - 3.75*self.Compliments.index(subject))
-        elif subject == self.Compliments[1][-1]:
-            self.fMeter = -1
-        else:
+            self.Compliments[0].remove(subject)
+        elif subject in self.Compliments[1]:
             self.fMeter -= round(self.Compliments.index(subject)*3.75 - 30)
+            if subject == self.Compliments[1][-1]:
+                self.fMeter = -1
+            self.Compliments[0].remove(subject)
+        else:
+            return False
 
 
 A = Lad("Bobby", 0)
