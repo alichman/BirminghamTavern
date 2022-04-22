@@ -20,7 +20,7 @@ class Lad:
         self.fileName = f"Characters\{self.kind}{random.randint(1, 3)}.txt"
         file = open(self.fileName, 'r')
         self.dataLines = file.readlines()
-        for Line in range(len(self.dataLines)-1):
+        for Line in range(len(self.dataLines) - 1):
             self.dataLines[Line] = self.dataLines[Line][:-2]
         self.image = self.dataLines[0]
         self.Compliments = [' '.split(self.dataLines[1]), ' '.split(self.dataLines[2])]
@@ -30,12 +30,16 @@ class Lad:
     def __str__(self):
         return str([self.fileName, self.Lines])
 
-    def getCompliment(self,subject):
+    def getKind(self):
+        typeNames = ['Businessperson', 'College Student', 'Bartender', 'Scientist', 'Artist']
+        return typeNames[Lad.ladTypes.index(self.kind)]
+
+    def Compliment(self, subject):
         if subject in self.Compliments[0]:
-            self.fMeter += round(30 - 3.75*self.Compliments.index(subject))
+            self.fMeter += round(30 - 3.75 * self.Compliments.index(subject))
             self.Compliments[0].remove(subject)
         elif subject in self.Compliments[1]:
-            self.fMeter -= round(self.Compliments.index(subject)*3.75 - 30)
+            self.fMeter -= round(self.Compliments.index(subject) * 3.75 - 30)
             if subject == self.Compliments[1][-1]:
                 self.fMeter = -1
             self.Compliments[0].remove(subject)
@@ -43,4 +47,12 @@ class Lad:
             return False
 
 
-A = Lad("Bobby", 1)
+All_Compliments = {"Looks": ['Teeth', 'Hair', 'Eyes'], "Craft": ['Skill', 'Creativity'],
+                   "Lifestyle": ['Wealth', 'Health', 'Life', 'Social'],
+                   "Vibe": ['Personality', 'GenVibe'], "Mindset": ['Intel', 'Aspiration']}
+
+A = Lad(input("Player 1: \nSelect Lad Name:\n"), int(input("Select Lad Type \n1: Business, 2: College Student, "
+                                                           "3: Bartender, 4:Scientist, 5: Artist :\n")) - 1)
+while True:
+
+    A.Compliment()
