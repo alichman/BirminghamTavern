@@ -40,4 +40,3 @@ class Lad:
 
 
 A = Lad("Bobby", 0)
-print(A)
