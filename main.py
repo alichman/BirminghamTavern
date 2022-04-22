@@ -8,9 +8,35 @@
 
 import random
 
+
 class Lad:
-    def __init__(self,name,kind):
+    ladTypes = ['bus_', 'col_', 'bar_', 'sci_', 'art_']
+
+    def __init__(self, name, kind):
         self.name = name
-        self.kind = kind
-        self.fMeter = 0 #out of 100
-    def get_compliments(self):
+        self.kind = Lad.ladTypes[kind]
+        self.fMeter = 0  # out of 100
+
+        self.fileName = f"Characters\{self.kind}{random.randint(1, 3)}.txt"
+        file = open(self.fileName, 'r')
+        self.dataLines = file.readlines()
+        for Line in range(len(self.dataLines)-1):
+            self.dataLines[Line] = self.dataLines[Line][:-2]
+        self.image = self.dataLines[0]
+        self.Compliments = [self.dataLines[1], self.dataLines[2]]
+        self.Lines = [self.dataLines[i] for i in range(3, 7)]
+        file.close()
+
+    def __str__(self):
+        return str([self.fileName, self.Lines])
+
+    def getCompliment(self,subject):
+        if subject in self.Compliments[0]:
+            self.fMeter += round(30 - 3.75*self.Compliments.index(subject))
+        elif subject == self.Compliments[1][-1]:
+            self.fMeter = -1
+        else:
+            self.fMeter -= round(self.Compliments.index(subject)*3.75 - 30)
+
+
+A = Lad("Bobby", 0)
