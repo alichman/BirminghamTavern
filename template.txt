@@ -1,0 +1,7 @@
+imgName
+allStrongCompliments
+allBadCompliments
+introductionLine
+winLine
+loseLine
+badLoseLine
