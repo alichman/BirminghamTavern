@@ -45,13 +45,17 @@ class Lad:
         elif subject in self.Compliments[1]:
             if self.fMeter - round(self.Compliments[1].index(subject) * 3.75) > 0:
                 self.fMeter -= round(self.Compliments[1].index(subject) * 3.75)
+                if self.fMeter >= 100:
+                    return [1,self.Lines[1]]
             else:
                 self.fMeter = 0
+
             if subject == self.Compliments[1][-1]:
                 self.fMeter = -1
+                return [-1,self.Lines[3]]
             self.Compliments[1].remove(subject)
         else:
-            return False
+            return -2
 
 
 All_Subjects = ['Looks', 'Craft', 'Lifestyle', 'Vibe', 'Mindset']
@@ -62,10 +66,15 @@ All_Compliments = {"Looks": ['Teeth', 'Hair', 'Eyes'], "Craft": ['Skill', 'Creat
 A = Lad(input("Player 1: \nSelect Lad Name:\n"), int(input("Select Lad Type \n1: Business, 2: College Student, "
                                                            "3: Bartender, 4:Scientist, 5: Artist :\n")) - 1)
 
-print("Select complement subject")
-for i in range(5):
-    print(f"{i+1}: {All_Subjects[i]}")
-compSubject = random.choice(All_Compliments[All_Subjects[int(input())-1]])
-print('subject: ', compSubject)
-A.Compliment(compSubject)
-print(A)
+while True:
+    print("Select complement subject")
+    for i in range(5):
+        print(f"{i+1}: {All_Subjects[i]}")
+    compSubject = random.choice(All_Compliments[All_Subjects[int(input())-1]])
+    print('subject: ', compSubject)
+    resultA = A.Compliment(compSubject)
+    print(A)
+    try:
+        print(resultA[1])
+    except TypeError:
+        print('nothing yet')
