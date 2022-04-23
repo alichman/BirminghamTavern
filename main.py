@@ -4,6 +4,10 @@
 #           Lads will have different characteristics, that would be more susceptible to compliments.
 #           Once a Lad's Flattered metre reaches maximum, they will accept the compliment, and respectfully
 #           forfeit the game.
+# Mechanics: Each Lad has weak and strong compliments, as well as a Lose-Condition game-ending compliment.
+#            Selecting the Lose-Condition makes the complimenting lad to lose the game.
+#            For all other compliments, the Lad will be flattered based on the compliment's ranking
+#            in the Lad's text file
 # Personality consultant: Carolinne
 
 import random
@@ -21,14 +25,14 @@ class Lad:
         file = open(self.fileName, 'r')
         self.dataLines = file.readlines()
         for Line in range(len(self.dataLines) - 1):
-            self.dataLines[Line] = self.dataLines[Line][:-2]
+            self.dataLines[Line] = self.dataLines[Line].strip()
         self.image = self.dataLines[0]
-        self.Compliments = [' '.split(self.dataLines[1]), ' '.split(self.dataLines[2])]
+        self.Compliments = [self.dataLines[1].split(), self.dataLines[2].split()]
         self.Lines = [self.dataLines[i] for i in range(3, 7)]
         file.close()
 
     def __str__(self):
-        return str([self.fileName, self.Lines])
+        return f'File: {self.fileName}, Flatter: {self.fMeter}, \nCompliments: {self.Compliments}'
 
     def getKind(self):
         typeNames = ['Businessperson', 'College Student', 'Bartender', 'Scientist', 'Artist']
@@ -36,23 +40,32 @@ class Lad:
 
     def Compliment(self, subject):
         if subject in self.Compliments[0]:
-            self.fMeter += round(30 - 3.75 * self.Compliments.index(subject))
+            self.fMeter += round(30 - 3.75 * self.Compliments[0].index(subject))
             self.Compliments[0].remove(subject)
         elif subject in self.Compliments[1]:
-            self.fMeter -= round(self.Compliments.index(subject) * 3.75 - 30)
+            if self.fMeter - round(self.Compliments[1].index(subject) * 3.75) > 0:
+                self.fMeter -= round(self.Compliments[1].index(subject) * 3.75)
+            else:
+                self.fMeter = 0
             if subject == self.Compliments[1][-1]:
                 self.fMeter = -1
-            self.Compliments[0].remove(subject)
+            self.Compliments[1].remove(subject)
         else:
             return False
 
 
+All_Subjects = ['Looks', 'Craft', 'Lifestyle', 'Vibe', 'Mindset']
 All_Compliments = {"Looks": ['Teeth', 'Hair', 'Eyes'], "Craft": ['Skill', 'Creativity'],
                    "Lifestyle": ['Wealth', 'Health', 'Life', 'Social'],
                    "Vibe": ['Personality', 'GenVibe'], "Mindset": ['Intel', 'Aspiration']}
 
 A = Lad(input("Player 1: \nSelect Lad Name:\n"), int(input("Select Lad Type \n1: Business, 2: College Student, "
                                                            "3: Bartender, 4:Scientist, 5: Artist :\n")) - 1)
-while True:
 
-    A.Compliment()
+print("Select complement subject")
+for i in range(5):
+    print(f"{i+1}: {All_Subjects[i]}")
+compSubject = random.choice(All_Compliments[All_Subjects[int(input())-1]])
+print('subject: ', compSubject)
+A.Compliment(compSubject)
+print(A)
