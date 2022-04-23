@@ -42,20 +42,23 @@ class Lad:
         if subject in self.Compliments[0]:
             self.fMeter += round(30 - 3.75 * self.Compliments[0].index(subject))
             self.Compliments[0].remove(subject)
+            if self.fMeter >= 100:
+                return [2, self.Lines[2]]
+            else:
+                return [1,None]
         elif subject in self.Compliments[1]:
             if self.fMeter - round(self.Compliments[1].index(subject) * 3.75) > 0:
                 self.fMeter -= round(self.Compliments[1].index(subject) * 3.75)
-                if self.fMeter >= 100:
-                    return [1,self.Lines[1]]
             else:
                 self.fMeter = 0
-
+            self.Compliments[1].remove(subject)
             if subject == self.Compliments[1][-1]:
                 self.fMeter = -1
-                return [-1,self.Lines[3]]
-            self.Compliments[1].remove(subject)
+                return [-2,self.Lines[3]]
+            else:
+                return [-1,None]
         else:
-            return -2
+            return [0,None]
 
 
 All_Subjects = ['Looks', 'Craft', 'Lifestyle', 'Vibe', 'Mindset']
