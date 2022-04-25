@@ -12,6 +12,8 @@
 
 import random
 
+from typing import List
+
 
 class Lad:
     ladTypes = ['bus_', 'col_', 'bar_', 'sci_', 'art_']
@@ -20,6 +22,12 @@ class Lad:
         self.name = name
         self.kind = Lad.ladTypes[kind]
         self.fMeter = 0  # out of 100
+
+        self.All_Compliments = {"Looks": ['Teeth', 'Hair', 'Eyes'],
+                                "Craft": ['Skill', 'Creativity'],
+                                "Lifestyle": ['Wealth', 'Health', 'Life', 'Social'],
+                                "Vibe": ['Personality', 'GenVibe'],
+                                "Mindset": ['Intel', 'Aspiration']}
 
         self.fileName = f"Characters\{self.kind}{random.randint(1, 3)}.txt"
         file = open(self.fileName, 'r')
@@ -38,46 +46,61 @@ class Lad:
         typeNames = ['Businessperson', 'College Student', 'Bartender', 'Scientist', 'Artist']
         return typeNames[Lad.ladTypes.index(self.kind)]
 
-    def Compliment(self, subject):
+    def getOptions(self):
+        toDel = []
+        for sect in self.All_Compliments.keys():
+            if not self.All_Compliments[sect]:
+                toDel.append(sect)
+        for item in toDel:
+            self.All_Compliments.pop(item,None)
+        return list(self.All_Compliments.keys())
+
+    def Compliment(self):
+        All_Subjects = A.getOptions()
+        print("Select complement subject")
+        for i, j in enumerate(All_Subjects):
+            print(f"{i + 1}: {j}")
+        subject = random.choice(self.All_Compliments[All_Subjects[int(input()) - 1]])
+        print('subject: ', subject)
+
         if subject in self.Compliments[0]:
             self.fMeter += round(30 - 3.75 * self.Compliments[0].index(subject))
             self.Compliments[0].remove(subject)
             if self.fMeter >= 100:
                 return [2, self.Lines[2]]
             else:
-                return [1,None]
+                result = [1, None]
         elif subject in self.Compliments[1]:
             if self.fMeter - round(self.Compliments[1].index(subject) * 3.75) > 0:
                 self.fMeter -= round(self.Compliments[1].index(subject) * 3.75)
             else:
                 self.fMeter = 0
             self.Compliments[1].remove(subject)
+
             if subject == self.Compliments[1][-1]:
                 self.fMeter = -1
-                return [-2,self.Lines[3]]
+                result = [-2, self.Lines[3]]
             else:
-                return [-1,None]
+                result = [-1, None]
         else:
-            return [0,None]
+            return [0, None]
 
+        for sect in list(self.All_Compliments.keys()):
+            print(sect)
+            if subject in self.All_Compliments[sect]:
+                print("+++++ IN HERE")
+                print(self.All_Compliments[sect])
+                self.All_Compliments[sect].remove(subject)
+                print(self.All_Compliments[sect])
+                print('DONE')
+                break
+        return result
 
-All_Subjects = ['Looks', 'Craft', 'Lifestyle', 'Vibe', 'Mindset']
-All_Compliments = {"Looks": ['Teeth', 'Hair', 'Eyes'], "Craft": ['Skill', 'Creativity'],
-                   "Lifestyle": ['Wealth', 'Health', 'Life', 'Social'],
-                   "Vibe": ['Personality', 'GenVibe'], "Mindset": ['Intel', 'Aspiration']}
 
 A = Lad(input("Player 1: \nSelect Lad Name:\n"), int(input("Select Lad Type \n1: Business, 2: College Student, "
                                                            "3: Bartender, 4:Scientist, 5: Artist :\n")) - 1)
 
 while True:
-    print("Select complement subject")
-    for i in range(5):
-        print(f"{i+1}: {All_Subjects[i]}")
-    compSubject = random.choice(All_Compliments[All_Subjects[int(input())-1]])
-    print('subject: ', compSubject)
-    resultA = A.Compliment(compSubject)
     print(A)
-    try:
-        print(resultA[1])
-    except TypeError:
-        print('nothing yet')
+    resultA = A.Compliment()
+    #print(resultA[1])
