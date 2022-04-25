@@ -31,6 +31,10 @@ class Lad:
         self.Lines = [self.dataLines[i] for i in range(3, 7)]
         file.close()
 
+        self.All_Compliments = {"Looks": ['Teeth', 'Hair', 'Eyes'], "Craft": ['Skill', 'Creativity'],
+                                "Lifestyle": ['Wealth', 'Health', 'Life', 'Social'],
+                                "Vibe": ['Personality', 'GenVibe'], "Mindset": ['Intel', 'Aspiration']}
+
     def __str__(self):
         return f'File: {self.fileName}, Flatter: {self.fMeter}, \nCompliments: {self.Compliments}'
 
@@ -38,10 +42,18 @@ class Lad:
         typeNames = ['Businessperson', 'College Student', 'Bartender', 'Scientist', 'Artist']
         return typeNames[Lad.ladTypes.index(self.kind)]
 
+    def getOptions(self):
+        All_Subjects = ['Looks', 'Craft', 'Lifestyle', 'Vibe', 'Mindset']
+
+
     def Compliment(self, subject):
         if subject in self.Compliments[0]:
             self.fMeter += round(30 - 3.75 * self.Compliments[0].index(subject))
             self.Compliments[0].remove(subject)
+            if self.fMeter >= 100:
+                return [2, self.Lines[2]]
+            else:
+                return [1, None]
         elif subject in self.Compliments[1]:
             if self.fMeter - round(self.Compliments[1].index(subject) * 3.75) > 0:
                 self.fMeter -= round(self.Compliments[1].index(subject) * 3.75)
@@ -49,23 +61,24 @@ class Lad:
                 self.fMeter = 0
             if subject == self.Compliments[1][-1]:
                 self.fMeter = -1
-            self.Compliments[1].remove(subject)
+                self.Compliments[1].remove(subject)
+                return [-2, self.Lines[3]]
+            else:
+                self.Compliments[1].remove(subject)
+                return [-1, None]
         else:
-            return False
+            return [0, None]
 
-
-All_Subjects = ['Looks', 'Craft', 'Lifestyle', 'Vibe', 'Mindset']
-All_Compliments = {"Looks": ['Teeth', 'Hair', 'Eyes'], "Craft": ['Skill', 'Creativity'],
-                   "Lifestyle": ['Wealth', 'Health', 'Life', 'Social'],
-                   "Vibe": ['Personality', 'GenVibe'], "Mindset": ['Intel', 'Aspiration']}
 
 A = Lad(input("Player 1: \nSelect Lad Name:\n"), int(input("Select Lad Type \n1: Business, 2: College Student, "
                                                            "3: Bartender, 4:Scientist, 5: Artist :\n")) - 1)
 
-print("Select complement subject")
-for i in range(5):
-    print(f"{i+1}: {All_Subjects[i]}")
-compSubject = random.choice(All_Compliments[All_Subjects[int(input())-1]])
-print('subject: ', compSubject)
-A.Compliment(compSubject)
-print(A)
+while True:
+    print("Select complement subject")
+    for i in range(5):
+        print(f"{i + 1}: {All_Subjects[i]}")
+    compSubject = random.choice(All_Compliments[All_Subjects[int(input()) - 1]])
+    print('subject: ', compSubject)
+    resultA = A.Compliment(compSubject)
+    print(A)
+    print(resultA[1])
