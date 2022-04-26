@@ -11,8 +11,8 @@
 # Personality consultant: Carolinne
 
 import random
-
-from typing import List
+from tkinter import *
+from PIL import Image, ImageTk
 
 
 class Lad:
@@ -52,7 +52,7 @@ class Lad:
             if not self.All_Compliments[sect]:
                 toDel.append(sect)
         for item in toDel:
-            self.All_Compliments.pop(item,None)
+            self.All_Compliments.pop(item, None)
         return list(self.All_Compliments.keys())
 
     def Compliment(self):
@@ -65,25 +65,25 @@ class Lad:
 
         if subject in self.Compliments[0]:
             self.fMeter += round(30 - 3.75 * self.Compliments[0].index(subject))
-            self.Compliments[0].remove(subject)
+
             if self.fMeter >= 100:
-                return [2, self.Lines[2]]
+                return [1, self.Lines[2]]
             else:
-                result = [1, None]
-        elif subject in self.Compliments[1]:
-            if self.fMeter - round(self.Compliments[1].index(subject) * 3.75) > 0:
-                self.fMeter -= round(self.Compliments[1].index(subject) * 3.75)
-            else:
+                result = [0, None]
+
+            self.Compliments[0].remove(subject)
+        else:
+            self.fMeter -= round(self.Compliments[1].index(subject) * 6)
+            if self.fMeter < 0:
                 self.fMeter = 0
-            self.Compliments[1].remove(subject)
 
             if subject == self.Compliments[1][-1]:
                 self.fMeter = -1
-                result = [-2, self.Lines[3]]
+                result = [-1, self.Lines[3]]
             else:
-                result = [-1, None]
-        else:
-            return [0, None]
+                result = [0, None]
+
+            self.Compliments[1].remove(subject)
 
         for sect in list(self.All_Compliments.keys()):
             print(sect)
@@ -97,10 +97,20 @@ class Lad:
         return result
 
 
+window = Tk()
+
 A = Lad(input("Player 1: \nSelect Lad Name:\n"), int(input("Select Lad Type \n1: Business, 2: College Student, "
                                                            "3: Bartender, 4:Scientist, 5: Artist :\n")) - 1)
 
 while True:
     print(A)
     resultA = A.Compliment()
-    #print(resultA[1])
+    if resultA[0] == 1:
+        print(A.fMeter, '\n')
+        print(resultA[1])
+        break
+    elif resultA[0] == -1:
+        print(A.fMeter, '\n')
+        print(resultA[1])
+        break
+window.mainloop()
