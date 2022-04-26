@@ -11,9 +11,11 @@
 # Personality consultant: Carolinne
 
 import random
-from tkinter import *
-from PIL import Image, ImageTk
+from pygame import *
 
+init()
+win = display.set_mode((640, 314))
+bob = image.load(f'BG/')
 
 class Lad:
     ladTypes = ['bus_', 'col_', 'bar_', 'sci_', 'art_']
@@ -97,8 +99,6 @@ class Lad:
         return result
 
 
-window = Tk()
-
 A = Lad(input("Player 1: \nSelect Lad Name:\n"), int(input("Select Lad Type \n1: Business, 2: College Student, "
                                                            "3: Bartender, 4:Scientist, 5: Artist :\n")) - 1)
 
@@ -113,4 +113,3 @@ while True:
         print(A.fMeter, '\n')
         print(resultA[1])
         break
-window.mainloop()
