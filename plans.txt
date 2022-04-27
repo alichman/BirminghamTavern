@@ -17,7 +17,7 @@ Artist
 Template:
 -----------
 imgName
-allSbtrongCompliments
+allStrongCompliments
 allBadCompliments
 introductionLine
 winLine
