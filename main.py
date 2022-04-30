@@ -11,17 +11,18 @@
 # Personality consultant: Carolinne
 
 import random
-from tkinter import *
-from PIL import Image, ImageTk
+
+from pygame import *
 
 
 class Lad:
     ladTypes = ['bus_', 'col_', 'bar_', 'sci_', 'art_']
 
-    def __init__(self, name, kind):
+    def __init__(self, name, kind, side):
         self.name = name
         self.kind = Lad.ladTypes[kind]
         self.fMeter = 0  # out of 100
+        self.side = 0
 
         self.All_Compliments = {"Looks": ['Teeth', 'Hair', 'Eyes'],
                                 "Craft": ['Skill', 'Creativity'],
@@ -29,12 +30,12 @@ class Lad:
                                 "Vibe": ['Personality', 'GenVibe'],
                                 "Mindset": ['Intel', 'Aspiration']}
 
-        self.fileName = f"Characters\{self.kind}{random.randint(1, 3)}.txt"
+        self.fileName = f"Characters/{self.kind}{random.randint(1, 3)}.txt"
         file = open(self.fileName, 'r')
         self.dataLines = file.readlines()
         for Line in range(len(self.dataLines) - 1):
             self.dataLines[Line] = self.dataLines[Line].strip()
-        self.image = self.dataLines[0]
+        self.image = image.load("images/" + self.dataLines[0])
         self.Compliments = [self.dataLines[1].split(), self.dataLines[2].split()]
         self.Lines = [self.dataLines[i] for i in range(3, 7)]
         file.close()
@@ -55,8 +56,21 @@ class Lad:
             self.All_Compliments.pop(item, None)
         return list(self.All_Compliments.keys())
 
+    def drawCharacter(self):
+        win.blit(self.image, (320, -5))
+
+    def drawOptions(self):
+        for i, j in enumerate(self.getOptions()):
+            win.blit(btn, (30 + i * 80, 270))
+            win.blit(text.render(j, True, (0, 0, 0)), (35 + i * 80 + (10-len(j))*2, 277))
+
+    def drawBar(self):
+        win.blit(bar, (5, 30))
+        BARPOS = self.fMeter / 234
+        draw.rect(win, (255, 255, 255), (11, int(269 - BARPOS), 7, int(BARPOS)))
+
     def Compliment(self):
-        All_Subjects = A.getOptions()
+        All_Subjects = self.getOptions()
         print("Select complement subject")
         for i, j in enumerate(All_Subjects):
             print(f"{i + 1}: {j}")
@@ -97,13 +111,31 @@ class Lad:
         return result
 
 
-window = Tk()
-
 A = Lad(input("Player 1: \nSelect Lad Name:\n"), int(input("Select Lad Type \n1: Business, 2: College Student, "
-                                                           "3: Bartender, 4:Scientist, 5: Artist :\n")) - 1)
+                                                           "3: Bartender, 4:Scientist, 5: Artist :\n")) - 1, 0)
+init()
+win = display.set_mode((640, 314))
+btn = image.load('images/btn.png')
+bar = image.load('images/bar.png')
+text = font.Font("FONT.ttf", 6)
+Clock = time.Clock()
+All_BG = [image.load(f'BG/{i}.png') for i in range(12)]
 
+frame = 0
 while True:
+    frame += 1
+    if frame >= 12:
+        frame = 0
+
+    win.blit(All_BG[frame], (0, 0))
+    A.drawCharacter()
+    A.drawOptions()
+    A.drawBar()
+    for Event in event.get():
+        if Event.type == QUIT:
+            quit()
     print(A)
+    '''
     resultA = A.Compliment()
     if resultA[0] == 1:
         print(A.fMeter, '\n')
@@ -113,4 +145,6 @@ while True:
         print(A.fMeter, '\n')
         print(resultA[1])
         break
-window.mainloop()
+    '''
+    display.update()
+    Clock.tick(6)
