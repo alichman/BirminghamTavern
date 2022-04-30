@@ -11,7 +11,6 @@
 # Personality consultant: Carolinne
 
 import random
-
 from pygame import *
 
 
