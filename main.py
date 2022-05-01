@@ -97,7 +97,7 @@ class Lad:
             bg.draw()
             P[cP].drawBar()
             P[cP].drawCharacter()
-            win.blit(box, (190, 230))
+            win.blit(box, (100, 230))
             step = writeSpeech(Line, step, self.name)
 
             for Event in event.get():
@@ -158,11 +158,11 @@ class BG:
             self.frame = 0
 
 
-def writeSpeech(Text, Iter, speak, Coord=(210,260)):
-    win.blit(text.render(speak + ' :', True, (0, 0, 0)), (210, 240))
-
-    Text = Text.split('~')
+def writeSpeech(Text, Iter, speak, Coord=(120,260)):
     cX, cY = Coord
+    win.blit(text.render(speak + ' :', True, (0, 0, 0)), (cX, cY-20))
+    Text = Text.split('~')
+
     if Iter is None:
         win.blit(text.render(Text[0], True, (0, 0, 0)), (cX, cY))
         win.blit(text.render(Text[1], True, (0, 0, 0)), (cX, cY + 10))
@@ -212,25 +212,6 @@ Bad_Lines = [i for i in f.readlines()]
 f.close()
 
 # INTRODUCTION PHASE
-'''
-step = 0
-while True:
-    if step is None:
-        waitFrame += 1
-        if waitFrame == 24:
-            break
-    bg.draw()
-    P[cP].drawCharacter()
-    win.blit(box, (190, 230))
-    step = writeSpeech(P[cP].Lines[0], step, P[cP].name)
-
-    for Event in event.get():
-        if Event.type == QUIT:
-            quit()
-
-    display.update()
-    Clock.tick(12)
-'''
 P[0].sayLine(0)
 
 # GAME PHASE
@@ -248,6 +229,14 @@ while True:
                 result = P[cP].Compliment(sub)
                 if result[0] == 1:
                     P[cP].sayLine(-2)
+                elif result[0] == 2:
+                    P[cP].sayLine(2)
+                    P[1-cP].sayLine(1)
+                    break
+                elif result[0] == -1:
+                    P[cP].sayLine(-1)
+                elif result[0] == -2:
+                    P[cP].sayLine(3)
 
     display.update()
     Clock.tick(12)
