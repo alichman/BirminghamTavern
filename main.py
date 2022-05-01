@@ -22,7 +22,7 @@ class Lad:
         self.name = name
         self.kind = Lad.ladTypes[kind]
         self.fMeter = 0  # out of 100
-        self.side = 0    # 0 is R, 1 is L
+        self.side = side  # 0 is R, 1 is L
 
         self.All_Compliments = {"Looks": ['Teeth', 'Hair', 'Eyes'],
                                 "Craft": ['Skill', 'Creativity'],
@@ -36,6 +36,8 @@ class Lad:
         for Line in range(len(self.dataLines) - 1):
             self.dataLines[Line] = self.dataLines[Line].strip()
         self.image = image.load("images/" + self.dataLines[0])
+        if self.side:
+            self.image = transform.flip(self.image, True, False)
         self.Compliments = [self.dataLines[1].split(), self.dataLines[2].split()]
         self.Lines = [self.dataLines[i] for i in range(3, 7)]
         file.close()
@@ -57,28 +59,37 @@ class Lad:
         return list(self.All_Compliments.keys())
 
     def drawCharacter(self):
-        win.blit(self.image, (320, -5))
+        if not self.side:
+            win.blit(self.image, (320, -5))
+        else:
+            win.blit(self.image, (0, -5))
 
     def drawOptions(self):
+        offset = 30 + self.side*180
         for i, j in enumerate(self.getOptions()):
-            win.blit(btn, (30 + i * 80, 270))
-            win.blit(text.render(j, True, (0, 0, 0)), (35 + i * 80 + (10 - len(j)) * 2, 277))
+            win.blit(btn, (offset + i * 80, 270))
+            win.blit(text.render(j, True, (0, 0, 0)), (offset+5 + i * 80 + (10 - len(j)) * 2, 277))
 
     def checkClick(self, mPos):
+        offset = 30 + self.side * 180
         if 270 <= mPos[1] <= 292:
             for i in range(len(self.getOptions())):
-                if 30 + i * 80 <= mPos[0] <= 105 + i * 80:
+                if offset + i * 80 <= mPos[0] <= offset+75 + i * 80:
                     return i
             return None
 
     def drawBar(self):
-        win.blit(bar, (5, 30))
+        if self.side:
+            x = 620
+        else:
+            x = 5
         BARPOS = int(234 * self.fMeter / 100)
-        draw.rect(win, (240, 194, 96), Rect(11, 269 - BARPOS, 7, BARPOS))
+        win.blit(bar, (x, 30))
+        draw.rect(win, (240, 194, 96), Rect(x+7, 269 - BARPOS, 7, BARPOS))
 
     def sayLine(self, line):
         if type(line) == int:
-            if line >=0:
+            if line >= 0:
                 Line = self.Lines[line]
             else:
                 Line = [random.choice(Good_Lines), random.choice(Bad_Lines)][line]
@@ -97,8 +108,11 @@ class Lad:
             bg.draw()
             P[cP].drawBar()
             P[cP].drawCharacter()
-            win.blit(box, (100, 230))
-            step = writeSpeech(Line, step, self.name)
+            if self.side:
+                Coord = (265, 260)
+            else:
+                Coord = (100, 260)
+            step = writeSpeech(Line, step, self.name, Coord)
 
             for Event in event.get():
                 if Event.type == QUIT:
@@ -158,9 +172,10 @@ class BG:
             self.frame = 0
 
 
-def writeSpeech(Text, Iter, speak, Coord=(120,260)):
+def writeSpeech(Text, Iter, speak, Coord):
     cX, cY = Coord
-    win.blit(text.render(speak + ' :', True, (0, 0, 0)), (cX, cY-20))
+    win.blit(box, (cX-20, cY-30))
+    win.blit(text.render(speak + ' :', True, (0, 0, 0)), (cX, cY - 20))
     Text = Text.split('~')
 
     if Iter is None:
@@ -171,15 +186,15 @@ def writeSpeech(Text, Iter, speak, Coord=(120,260)):
 
     if Iter < len(Text[0]):
         win.blit(text.render(Text[0][0:Iter], True, (0, 0, 0)), (cX, cY))
-    elif Iter < len(Text[1]+Text[0]):
+    elif Iter < len(Text[1] + Text[0]):
         win.blit(text.render(Text[0], True, (0, 0, 0)), (cX, cY))
-        win.blit(text.render(Text[1][0:Iter-len(Text[0])], True, (0, 0, 0)), (cX, cY+10))
-    elif Iter < len(Text[0]+Text[1]+Text[2]):
+        win.blit(text.render(Text[1][0:Iter - len(Text[0])], True, (0, 0, 0)), (cX, cY + 10))
+    elif Iter < len(Text[0] + Text[1] + Text[2]):
         win.blit(text.render(Text[0], True, (0, 0, 0)), (cX, cY))
-        win.blit(text.render(Text[1], True, (0, 0, 0)), (cX, cY+10))
-        win.blit(text.render(Text[2][0:Iter - len(Text[0]+Text[1])], True, (0, 0, 0)), (cX, cY + 20))
+        win.blit(text.render(Text[1], True, (0, 0, 0)), (cX, cY + 10))
+        win.blit(text.render(Text[2][0:Iter - len(Text[0] + Text[1])], True, (0, 0, 0)), (cX, cY + 20))
 
-    elif Iter >= len(Text[0]+Text[1]+Text[2]):
+    elif Iter >= len(Text[0] + Text[1] + Text[2]):
         return None
     return Iter + 1
 
@@ -189,7 +204,7 @@ P = [Lad(input("Player 1: \nSelect Lad Name:\n"),
                    "2: College Student, "
                    "3: Bartender, "
                    "4:Scientist, "
-                   "5: Artist :\n")) - 1, 0) for i in range(2)]
+                   "5: Artist :\n")) - 1, i) for i in range(2)]
 
 waitFrame = 0
 
@@ -235,8 +250,8 @@ while GAME:
                     P[cP].sayLine(-2)
                 elif result[0] == 2:
                     P[cP].sayLine(2)
-                    cP = 1-cP
-                    P[1-cP].sayLine(1)
+                    cP = 1 - cP
+                    P[1 - cP].sayLine(1)
                     GAME = False
                 elif result[0] == -1:
                     P[cP].sayLine(-1)
