@@ -9,10 +9,9 @@
 #            For all other compliments, the Lad will be flattered based on the compliment's ranking
 #            in the Lad's text file
 # Personality consultant: Carolinne
+# Graphics consultants: Carolinne, Lauren
 
 import random
-
-import pygame
 from pygame import *
 
 
@@ -157,7 +156,7 @@ while True:
     for Event in event.get():
         if Event.type == QUIT:
             quit()
-        elif Event.type == pygame.MOUSEBUTTONUP:
+        elif Event.type == MOUSEBUTTONUP:
             sub = P[cP].checkClick(mouse.get_pos())
             if sub is not None:
                 result = P[cP].Compliment(sub)
