@@ -22,7 +22,7 @@ class Lad:
         self.name = name
         self.kind = Lad.ladTypes[kind]
         self.fMeter = 0  # out of 100
-        self.side = 0
+        self.side = 0    # 0 is R, 1 is L
 
         self.All_Compliments = {"Looks": ['Teeth', 'Hair', 'Eyes'],
                                 "Craft": ['Skill', 'Creativity'],
@@ -191,7 +191,6 @@ P = [Lad(input("Player 1: \nSelect Lad Name:\n"),
                    "4:Scientist, "
                    "5: Artist :\n")) - 1, 0) for i in range(2)]
 
-cP = 0
 waitFrame = 0
 
 init()
@@ -212,10 +211,15 @@ Bad_Lines = [i for i in f.readlines()]
 f.close()
 
 # INTRODUCTION PHASE
+cP = 0
 P[0].sayLine(0)
+cP = 1
+P[1].sayLine(0)
+cP = 0
 
 # GAME PHASE
-while True:
+GAME = True
+while GAME:
     bg.draw()
     P[cP].drawCharacter()
     P[cP].drawOptions()
@@ -231,12 +235,15 @@ while True:
                     P[cP].sayLine(-2)
                 elif result[0] == 2:
                     P[cP].sayLine(2)
+                    cP = 1-cP
                     P[1-cP].sayLine(1)
-                    break
+                    GAME = False
                 elif result[0] == -1:
                     P[cP].sayLine(-1)
                 elif result[0] == -2:
                     P[cP].sayLine(3)
+                    GAME = False
+                cP = 1 - cP
 
     display.update()
     Clock.tick(12)
