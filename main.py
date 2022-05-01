@@ -37,7 +37,7 @@ class Lad:
             self.dataLines[Line] = self.dataLines[Line].strip()
         self.image = image.load("images/" + self.dataLines[0])
         self.Compliments = [self.dataLines[1].split(), self.dataLines[2].split()]
-        self.Lines = [self.dataLines[i] for i in range(3, 7)]
+        self.Lines = [self.dataLines[i].split('~') for i in range(3, 7)]
         file.close()
 
     def __str__(self):
@@ -115,41 +115,95 @@ class Lad:
         return status
 
 
+class BG:
+    def __init__(self):
+        self.frame = 0
+        self.images = [image.load(f'BG/{i}.png') for i in range(12)]
+
+    def draw(self):
+        win.blit(self.images[self.frame // 2], (0, 0))
+        self.frame += 1
+        if self.frame == 24:
+            self.frame = 0
+
+
+def writeSpeech(Text, Iter, speak, Coord=(210,260)):
+    win.blit(text.render(speak + ' :', True, (0, 0, 0)), (210, 240))
+
+    cX, cY = Coord
+    if Iter is None:
+        win.blit(text.render(Text[0], True, (0, 0, 0)), (cX, cY))
+        win.blit(text.render(Text[1], True, (0, 0, 0)), (cX, cY + 10))
+        win.blit(text.render(Text[2], True, (0, 0, 0)), (cX, cY + 20))
+        return None
+
+    if Iter < len(Text[0]):
+        win.blit(text.render(Text[0][0:Iter], True, (0, 0, 0)), (cX, cY))
+    elif Iter < len(Text[1]+Text[0]):
+        win.blit(text.render(Text[0], True, (0, 0, 0)), (cX, cY))
+        win.blit(text.render(Text[1][0:Iter-len(Text[0])], True, (0, 0, 0)), (cX, cY+10))
+    elif Iter < len(Text[0]+Text[1]+Text[2]):
+        win.blit(text.render(Text[0], True, (0, 0, 0)), (cX, cY))
+        win.blit(text.render(Text[1], True, (0, 0, 0)), (cX, cY+10))
+        win.blit(text.render(Text[2][0:Iter - len(Text[0]+Text[1])], True, (0, 0, 0)), (cX, cY + 20))
+
+    elif Iter >= len(Text[0]+Text[1]+Text[2]):
+        return None
+    return Iter + 1
+
+
 P = [Lad(input("Player 1: \nSelect Lad Name:\n"),
          int(input("Select Lad Type \n1: Business, "
                    "2: College Student, "
                    "3: Bartender, "
                    "4:Scientist, "
                    "5: Artist :\n")) - 1, 0) for i in range(1)]
-cP = 0
 
+cP = 0
+waitFrame = 0
 
 init()
 win = display.set_mode((640, 314))
 btn = image.load('images/btn.png')
 bar = image.load('images/bar.png')
 text = font.Font("FONT.ttf", 6)
+box = image.load('images/tBox.png')
 Clock = time.Clock()
-All_BG = [image.load(f'BG/{i}.png') for i in range(12)]
+bg = BG()
 
-
-f = open('genComps/good.txt', 'r')
+f = open('genLines/good.txt', 'r')
 Good_Lines = [i for i in f.readlines()]
 f.close()
 
-f = open('genComps/bad.txt', 'r')
+f = open('genLines/bad.txt', 'r')
 Bad_Lines = [i for i in f.readlines()]
 f.close()
 
-
-frame = 0
-
+# INTRODUCTION PHASE
+step = 0
 while True:
-    frame += 1
-    if frame >= 12:
-        frame = 0
+    if step is None:
+        waitFrame += 1
+        if waitFrame == 24:
+            break
+    bg.draw()
+    P[cP].drawCharacter()
+    win.blit(box, (190, 230))
+    step = writeSpeech(P[cP].Lines[0], step, P[cP].name)
 
-    win.blit(All_BG[frame], (0, 0))
+    for Event in event.get():
+        if Event.type == QUIT:
+            quit()
+
+    display.update()
+    Clock.tick(12)
+
+
+
+
+# GAME PHASE
+while True:
+    bg.draw()
     P[cP].drawCharacter()
     P[cP].drawOptions()
     P[cP].drawBar()
@@ -162,4 +216,5 @@ while True:
                 result = P[cP].Compliment(sub)
 
     display.update()
-    Clock.tick(6)
+    Clock.tick(12)
+
