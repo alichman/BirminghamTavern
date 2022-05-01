@@ -11,6 +11,8 @@
 # Personality consultant: Carolinne
 
 import random
+
+import pygame
 from pygame import *
 
 
@@ -61,19 +63,23 @@ class Lad:
     def drawOptions(self):
         for i, j in enumerate(self.getOptions()):
             win.blit(btn, (30 + i * 80, 270))
-            win.blit(text.render(j, True, (0, 0, 0)), (35 + i * 80 + (10-len(j))*2, 277))
+            win.blit(text.render(j, True, (0, 0, 0)), (35 + i * 80 + (10 - len(j)) * 2, 277))
+
+    def checkClick(self, mPos):
+        if 270 <= mPos[1] <= 292:
+            for i in range(len(self.getOptions())):
+                if 30 + i * 80 <= mPos[0] <= 105 + i * 80:
+                    return i
+            return None
 
     def drawBar(self):
         win.blit(bar, (5, 30))
-        BARPOS = self.fMeter / 234
-        draw.rect(win, (255, 255, 255), (11, int(269 - BARPOS), 7, int(BARPOS)))
+        BARPOS = int(234 * self.fMeter / 100)
+        draw.rect(win, (240, 194, 96), Rect(11, 269 - BARPOS, 7, BARPOS))
 
-    def Compliment(self):
+    def Compliment(self, Sub):
         All_Subjects = self.getOptions()
-        print("Select complement subject")
-        for i, j in enumerate(All_Subjects):
-            print(f"{i + 1}: {j}")
-        subject = random.choice(self.All_Compliments[All_Subjects[int(input()) - 1]])
+        subject = random.choice(self.All_Compliments[All_Subjects[Sub]])
         print('subject: ', subject)
 
         if subject in self.Compliments[0]:
@@ -82,7 +88,7 @@ class Lad:
             if self.fMeter >= 100:
                 return [1, self.Lines[2]]
             else:
-                result = [0, None]
+                status = [0, None]
 
             self.Compliments[0].remove(subject)
         else:
@@ -92,26 +98,33 @@ class Lad:
 
             if subject == self.Compliments[1][-1]:
                 self.fMeter = -1
-                result = [-1, self.Lines[3]]
+                status = [-1, self.Lines[3]]
             else:
-                result = [0, None]
+                status = [0, None]
 
             self.Compliments[1].remove(subject)
 
         for sect in list(self.All_Compliments.keys()):
-            print(sect)
             if subject in self.All_Compliments[sect]:
                 print("+++++ IN HERE")
                 print(self.All_Compliments[sect])
                 self.All_Compliments[sect].remove(subject)
                 print(self.All_Compliments[sect])
+                print('flatter: ', self.fMeter)
                 print('DONE')
                 break
-        return result
+        return status
 
 
-A = Lad(input("Player 1: \nSelect Lad Name:\n"), int(input("Select Lad Type \n1: Business, 2: College Student, "
-                                                           "3: Bartender, 4:Scientist, 5: Artist :\n")) - 1, 0)
+P = [Lad(input("Player 1: \nSelect Lad Name:\n"),
+         int(input("Select Lad Type \n1: Business, "
+                   "2: College Student, "
+                   "3: Bartender, "
+                   "4:Scientist, "
+                   "5: Artist :\n")) - 1, 0) for i in range(1)]
+cP = 0
+
+
 init()
 win = display.set_mode((640, 314))
 btn = image.load('images/btn.png')
@@ -120,30 +133,34 @@ text = font.Font("FONT.ttf", 6)
 Clock = time.Clock()
 All_BG = [image.load(f'BG/{i}.png') for i in range(12)]
 
+
+f = open('genComps/good.txt', 'r')
+Good_Lines = [i for i in f.readlines()]
+f.close()
+
+f = open('genComps/bad.txt', 'r')
+Bad_Lines = [i for i in f.readlines()]
+f.close()
+
+
 frame = 0
+
 while True:
     frame += 1
     if frame >= 12:
         frame = 0
 
     win.blit(All_BG[frame], (0, 0))
-    A.drawCharacter()
-    A.drawOptions()
-    A.drawBar()
+    P[cP].drawCharacter()
+    P[cP].drawOptions()
+    P[cP].drawBar()
     for Event in event.get():
         if Event.type == QUIT:
             quit()
-    print(A)
-    '''
-    resultA = A.Compliment()
-    if resultA[0] == 1:
-        print(A.fMeter, '\n')
-        print(resultA[1])
-        break
-    elif resultA[0] == -1:
-        print(A.fMeter, '\n')
-        print(resultA[1])
-        break
-    '''
+        elif Event.type == pygame.MOUSEBUTTONUP:
+            sub = P[cP].checkClick(mouse.get_pos())
+            if sub is not None:
+                result = P[cP].Compliment(sub)
+
     display.update()
     Clock.tick(6)
