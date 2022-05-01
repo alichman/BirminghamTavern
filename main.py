@@ -37,7 +37,7 @@ class Lad:
             self.dataLines[Line] = self.dataLines[Line].strip()
         self.image = image.load("images/" + self.dataLines[0])
         self.Compliments = [self.dataLines[1].split(), self.dataLines[2].split()]
-        self.Lines = [self.dataLines[i].split('~') for i in range(3, 7)]
+        self.Lines = [self.dataLines[i] for i in range(3, 7)]
         file.close()
 
     def __str__(self):
@@ -76,6 +76,37 @@ class Lad:
         BARPOS = int(234 * self.fMeter / 100)
         draw.rect(win, (240, 194, 96), Rect(11, 269 - BARPOS, 7, BARPOS))
 
+    def sayLine(self, line):
+        if type(line) == int:
+            if line >=0:
+                Line = self.Lines[line]
+            else:
+                Line = [random.choice(Good_Lines), random.choice(Bad_Lines)][line]
+        else:
+            f = open(f"genComps/{line}")
+            Line = random.choice(f.readlines())
+            f.close()
+
+        step = 0
+        waitFrame = 0
+        while True:
+            if step is None:
+                waitFrame += 1
+                if waitFrame == 24:
+                    break
+            bg.draw()
+            P[cP].drawBar()
+            P[cP].drawCharacter()
+            win.blit(box, (190, 230))
+            step = writeSpeech(Line, step, self.name)
+
+            for Event in event.get():
+                if Event.type == QUIT:
+                    quit()
+
+            display.update()
+            Clock.tick(12)
+
     def Compliment(self, Sub):
         All_Subjects = self.getOptions()
         subject = random.choice(self.All_Compliments[All_Subjects[Sub]])
@@ -85,9 +116,9 @@ class Lad:
             self.fMeter += round(30 - 3.75 * self.Compliments[0].index(subject))
 
             if self.fMeter >= 100:
-                return [1, self.Lines[2]]
+                status = [2, self.Lines[2]]
             else:
-                status = [0, None]
+                status = [1, None]
 
             self.Compliments[0].remove(subject)
         else:
@@ -97,9 +128,9 @@ class Lad:
 
             if subject == self.Compliments[1][-1]:
                 self.fMeter = -1
-                status = [-1, self.Lines[3]]
+                status = [-2, self.Lines[3]]
             else:
-                status = [0, None]
+                status = [-1, None]
 
             self.Compliments[1].remove(subject)
 
@@ -130,6 +161,7 @@ class BG:
 def writeSpeech(Text, Iter, speak, Coord=(210,260)):
     win.blit(text.render(speak + ' :', True, (0, 0, 0)), (210, 240))
 
+    Text = Text.split('~')
     cX, cY = Coord
     if Iter is None:
         win.blit(text.render(Text[0], True, (0, 0, 0)), (cX, cY))
@@ -157,7 +189,7 @@ P = [Lad(input("Player 1: \nSelect Lad Name:\n"),
                    "2: College Student, "
                    "3: Bartender, "
                    "4:Scientist, "
-                   "5: Artist :\n")) - 1, 0) for i in range(1)]
+                   "5: Artist :\n")) - 1, 0) for i in range(2)]
 
 cP = 0
 waitFrame = 0
@@ -180,6 +212,7 @@ Bad_Lines = [i for i in f.readlines()]
 f.close()
 
 # INTRODUCTION PHASE
+'''
 step = 0
 while True:
     if step is None:
@@ -197,9 +230,8 @@ while True:
 
     display.update()
     Clock.tick(12)
-
-
-
+'''
+P[0].sayLine(0)
 
 # GAME PHASE
 while True:
@@ -214,7 +246,8 @@ while True:
             sub = P[cP].checkClick(mouse.get_pos())
             if sub is not None:
                 result = P[cP].Compliment(sub)
+                if result[0] == 1:
+                    P[cP].sayLine(-2)
 
     display.update()
     Clock.tick(12)
-
