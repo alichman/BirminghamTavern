@@ -199,7 +199,7 @@ def writeSpeech(Text, Iter, speak, Coord):
     return Iter + 1
 
 
-P = [Lad(input("Player 1: \nSelect Lad Name:\n"),
+P = [Lad(input(f"Player {1+i}: \nSelect Lad Name:\n"),
          int(input("Select Lad Type \n1: Business, "
                    "2: College Student, "
                    "3: Bartender, "
