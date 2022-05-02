@@ -85,16 +85,19 @@ class Lad:
             x = 5
         BARPOS = int(234 * self.fMeter / 100)
         win.blit(bar, (x, 30))
-        draw.rect(win, (240, 194, 96), Rect(x+7, 269 - BARPOS, 7, BARPOS))
+        draw.rect(win, (240, 194, 96), Rect(x+6, 269 - BARPOS, 7, BARPOS))
 
-    def sayLine(self, line):
+    def sayLine(self, line, side=None):
+        if side is None:
+            side = self.side
+
         if type(line) == int:
             if line >= 0:
                 Line = self.Lines[line]
             else:
                 Line = [random.choice(Good_Lines), random.choice(Bad_Lines)][line]
         else:
-            f = open(f"genComps/{line}")
+            f = open(f"genLines/{line}.txt")
             Line = random.choice(f.readlines())
             f.close()
 
@@ -108,7 +111,7 @@ class Lad:
             bg.draw()
             P[cP].drawBar()
             P[cP].drawCharacter()
-            if self.side:
+            if side:
                 Coord = (265, 260)
             else:
                 Coord = (100, 260)
@@ -117,6 +120,8 @@ class Lad:
             for Event in event.get():
                 if Event.type == QUIT:
                     quit()
+                if Event.type == MOUSEBUTTONUP:
+                    step = None
 
             display.update()
             Clock.tick(12)
@@ -125,6 +130,7 @@ class Lad:
         All_Subjects = self.getOptions()
         subject = random.choice(self.All_Compliments[All_Subjects[Sub]])
         print('subject: ', subject)
+        P[1-cP].sayLine(subject, self.side)
 
         if subject in self.Compliments[0]:
             self.fMeter += round(30 - 3.75 * self.Compliments[0].index(subject))
@@ -262,3 +268,4 @@ while GAME:
 
     display.update()
     Clock.tick(12)
+    print('babun')
