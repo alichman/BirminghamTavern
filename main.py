@@ -8,7 +8,7 @@
 #            Selecting the Lose-Condition makes the complimenting lad to lose the game.
 #            For all other compliments, the Lad will be flattered based on the compliment's ranking
 #            in the Lad's text file
-# Personality consultant: Carolinne
+# Personality consultants: Carolinne, Iza, Danell
 # Graphics consultants: Carolinne, Lauren
 
 import random
