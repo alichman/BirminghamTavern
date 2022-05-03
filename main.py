@@ -26,7 +26,7 @@ class Lad:
 
         self.All_Compliments = {"Looks": ['Teeth', 'Hair', 'Eyes'],
                                 "Craft": ['Skill', 'Creativity'],
-                                "Lifestyle": ['Wealth', 'Health', 'Life', 'Social'],
+                                "Lifestyle": ['Wealth', 'Health', 'Social'],
                                 "Vibe": ['Personality', 'GenVibe'],
                                 "Mindset": ['Intel', 'Aspiration']}
 
@@ -121,7 +121,10 @@ class Lad:
                 if Event.type == QUIT:
                     quit()
                 if Event.type == MOUSEBUTTONUP:
-                    step = None
+                    if step is None:
+                       waitFrame = 23
+                    else:
+                        step = None
 
             display.update()
             Clock.tick(12)
@@ -156,12 +159,7 @@ class Lad:
 
         for sect in list(self.All_Compliments.keys()):
             if subject in self.All_Compliments[sect]:
-                print("+++++ IN HERE")
-                print(self.All_Compliments[sect])
                 self.All_Compliments[sect].remove(subject)
-                print(self.All_Compliments[sect])
-                print('flatter: ', self.fMeter)
-                print('DONE')
                 break
         return status
 
@@ -183,6 +181,9 @@ def writeSpeech(Text, Iter, speak, Coord):
     win.blit(box, (cX-20, cY-30))
     win.blit(text.render(speak + ' :', True, (0, 0, 0)), (cX, cY - 20))
     Text = Text.split('~')
+    for i, j in enumerate(Text):
+        if not j:
+            Text[i] = '   '
 
     if Iter is None:
         win.blit(text.render(Text[0], True, (0, 0, 0)), (cX, cY))
@@ -267,4 +268,3 @@ while GAME:
 
     display.update()
     Clock.tick(12)
-    print('babun')
