@@ -230,7 +230,6 @@ cP = 0
 P[0].sayLine(0)
 cP = 1
 P[1].sayLine(0)
-cP = 0
 
 # GAME PHASE
 GAME = True
