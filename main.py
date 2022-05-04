@@ -42,6 +42,7 @@ class Lad:
         self.Lines = [self.dataLines[i] for i in range(3, 7)]
         file.close()
 
+
     def __str__(self):
         return f'File: {self.fileName}, Flatter: {self.fMeter}, \nCompliments: {self.Compliments}'
 
@@ -77,6 +78,7 @@ class Lad:
                 if offset + i * 80 <= mPos[0] <= offset+75 + i * 80:
                     return i
             return None
+
 
     def drawBar(self):
         if self.side:
