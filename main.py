@@ -181,9 +181,6 @@ def writeSpeech(Text, Iter, speak, Coord):
     win.blit(box, (cX-20, cY-30))
     win.blit(text.render(speak + ' :', True, (0, 0, 0)), (cX, cY - 20))
     Text = Text.split('~')
-    for i, j in enumerate(Text):
-        if not j:
-            Text[i] = '   '
 
     if Iter is None:
         win.blit(text.render(Text[0], True, (0, 0, 0)), (cX, cY))
