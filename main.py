@@ -29,8 +29,10 @@ class Lad:
                                 "Lifestyle": ['Wealth', 'Health', 'Social'],
                                 "Vibe": ['Personality', 'GenVibe'],
                                 "Mindset": ['Intel', 'Aspiration']}
-
-        self.fileName = f"Characters/{self.kind}{random.randint(1, 3)}.txt"
+        if self.kind == 'art_' and self.name == 'Karen':
+            self.fileName = f"Characters/{self.kind}1.txt"
+        else:
+            self.fileName = f"Characters/{self.kind}{random.randint(1, 3)}.txt"
         file = open(self.fileName, 'r')
         self.dataLines = file.readlines()
         for Line in range(len(self.dataLines) - 1):
@@ -41,10 +43,6 @@ class Lad:
         self.Compliments = [self.dataLines[1].split(), self.dataLines[2].split()]
         self.Lines = [self.dataLines[i] for i in range(3, 7)]
         file.close()
-
-
-    def __str__(self):
-        return f'File: {self.fileName}, Flatter: {self.fMeter}, \nCompliments: {self.Compliments}'
 
     def getKind(self):
         typeNames = ['Businessperson', 'College Student', 'Bartender', 'Scientist', 'Artist']
@@ -78,7 +76,6 @@ class Lad:
                 if offset + i * 80 <= mPos[0] <= offset+75 + i * 80:
                     return i
             return None
-
 
     def drawBar(self):
         if self.side:
@@ -251,7 +248,6 @@ while GAME:
             sub = P[cP].checkClick(mouse.get_pos())
             if sub is not None:
                 result = P[cP].Compliment(sub)
-                result = [2,P[cP].Lines[2]]
                 if result[0] == 1:
                     P[cP].sayLine(-2)
                 elif result[0] == 2:
