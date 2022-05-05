@@ -251,12 +251,13 @@ while GAME:
             sub = P[cP].checkClick(mouse.get_pos())
             if sub is not None:
                 result = P[cP].Compliment(sub)
+                result = [2,P[cP].Lines[2]]
                 if result[0] == 1:
                     P[cP].sayLine(-2)
                 elif result[0] == 2:
                     P[cP].sayLine(2)
-                    cP = 1 - cP
-                    P[1 - cP].sayLine(1)
+                    cP = 1-cP
+                    P[cP].sayLine(1)
                     GAME = False
                 elif result[0] == -1:
                     P[cP].sayLine(-1)
