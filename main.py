@@ -30,7 +30,7 @@ class Lad:
                                 "Vibe": ['Personality', 'GenVibe'],
                                 "Mindset": ['Intel', 'Aspiration']}
         if self.kind == 'art_' and self.name == 'Karen':
-            self.fileName = f"Characters/{self.kind}1.txt"
+            self.fileName = f"Characters/art_1.txt"
         else:
             self.fileName = f"Characters/{self.kind}{random.randint(1, 3)}.txt"
         file = open(self.fileName, 'r')
