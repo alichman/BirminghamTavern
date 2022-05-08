@@ -8,7 +8,7 @@
 #            Selecting the Lose-Condition makes the complimenting lad to lose the game.
 #            For all other compliments, the Lad will be flattered based on the compliment's ranking
 #            in the Lad's text file
-# Personality consultants: Carolinne, Iza, Danell
+# Personality consultants: Carolinne, Iza, Danell, Olivia
 # Graphics consultants: Carolinne, Lauren
 
 import random
@@ -33,11 +33,16 @@ class Lad:
             self.fileName = f"Characters/art_1.txt"
         else:
             self.fileName = f"Characters/{self.kind}{random.randint(1, 3)}.txt"
+
         file = open(self.fileName, 'r')
         self.dataLines = file.readlines()
+
         for Line in range(len(self.dataLines) - 1):
             self.dataLines[Line] = self.dataLines[Line].strip()
-        self.image = image.load("images/" + self.dataLines[0])
+
+        firstVals = self.dataLines[0].split()
+        self.image = image.load("images/" + firstVals[0])
+        self.sound = firstVals[1]
         if self.side:
             self.image = transform.flip(self.image, True, False)
         self.Compliments = [self.dataLines[1].split(), self.dataLines[2].split()]
@@ -64,16 +69,16 @@ class Lad:
             win.blit(self.image, (0, -5))
 
     def drawOptions(self):
-        offset = 30 + self.side*180
+        offset = 30 + self.side * 180
         for i, j in enumerate(self.getOptions()):
             win.blit(btn, (offset + i * 80, 270))
-            win.blit(text.render(j, True, (0, 0, 0)), (offset+5 + i * 80 + (10 - len(j)) * 2, 277))
+            win.blit(text.render(j, True, (0, 0, 0)), (offset + 5 + i * 80 + (10 - len(j)) * 2, 277))
 
     def checkClick(self, mPos):
         offset = 30 + self.side * 180
         if 270 <= mPos[1] <= 292:
             for i in range(len(self.getOptions())):
-                if offset + i * 80 <= mPos[0] <= offset+75 + i * 80:
+                if offset + i * 80 <= mPos[0] <= offset + 75 + i * 80:
                     return i
             return None
 
@@ -84,7 +89,7 @@ class Lad:
             x = 5
         BARPOS = int(234 * self.fMeter / 100)
         win.blit(bar, (x, 30))
-        draw.rect(win, (240, 194, 96), Rect(x+6, 269 - BARPOS, 7, BARPOS))
+        draw.rect(win, (240, 194, 96), Rect(x + 6, 269 - BARPOS, 7, BARPOS))
 
     def sayLine(self, line, side=None):
         if side is None:
@@ -114,14 +119,14 @@ class Lad:
                 Coord = (265, 260)
             else:
                 Coord = (100, 260)
-            step = writeSpeech(Line, step, self.name, Coord)
+            step = writeSpeech(Line, step, self.name, Coord, self.sound)
 
             for Event in event.get():
                 if Event.type == QUIT:
                     quit()
                 if Event.type == MOUSEBUTTONUP:
                     if step is None:
-                       waitFrame = 23
+                        waitFrame = 23
                     else:
                         step = None
 
@@ -132,7 +137,7 @@ class Lad:
         All_Subjects = self.getOptions()
         subject = random.choice(self.All_Compliments[All_Subjects[Sub]])
         print('subject: ', subject)
-        P[1-cP].sayLine(subject, self.side)
+        P[1 - cP].sayLine(subject, self.side)
 
         if subject in self.Compliments[0]:
             self.fMeter += round(30 - 3.75 * self.Compliments[0].index(subject))
@@ -175,10 +180,10 @@ class BG:
             self.frame = 0
 
 
-def writeSpeech(Text, Iter, speak, Coord):
+def writeSpeech(Text, Iter, Speak, Coord, Sound):
     cX, cY = Coord
-    win.blit(box, (cX-20, cY-30))
-    win.blit(text.render(speak + ' :', True, (0, 0, 0)), (cX, cY - 20))
+    win.blit(box, (cX - 20, cY - 30))
+    win.blit(text.render(Speak + ' :', True, (0, 0, 0)), (cX, cY - 20))
     Text = Text.split('~')
 
     if Iter is None:
@@ -202,7 +207,7 @@ def writeSpeech(Text, Iter, speak, Coord):
     return Iter + 1
 
 
-P = [Lad(input(f"Player {1+i}: \nSelect Lad Name:\n"),
+P = [Lad(input(f"Player {1 + i}: \nSelect Lad Name:\n"),
          int(input("Select Lad Type \n1: Business, "
                    "2: College Student, "
                    "3: Bartender, "
@@ -252,7 +257,7 @@ while GAME:
                     P[cP].sayLine(-2)
                 elif result[0] == 2:
                     P[cP].sayLine(2)
-                    cP = 1-cP
+                    cP = 1 - cP
                     P[cP].sayLine(1)
                     GAME = False
                 elif result[0] == -1:
