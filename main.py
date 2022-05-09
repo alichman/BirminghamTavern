@@ -42,7 +42,7 @@ class Lad:
 
         firstVals = self.dataLines[0].split()
         self.image = image.load("images/" + firstVals[0])
-        self.sound = firstVals[1]
+        #self.sound = firstVals[1]
         if self.side:
             self.image = transform.flip(self.image, True, False)
         self.Compliments = [self.dataLines[1].split(), self.dataLines[2].split()]
@@ -119,7 +119,7 @@ class Lad:
                 Coord = (265, 260)
             else:
                 Coord = (100, 260)
-            step = writeSpeech(Line, step, self.name, Coord, self.sound)
+            step = writeSpeech(Line, step, self.name, Coord, None)
 
             for Event in event.get():
                 if Event.type == QUIT:
