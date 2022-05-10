@@ -265,7 +265,7 @@ for i in range(2):
                                  "3: Bartender, "
                                  "4:Scientist, "
                                  "5: Artist :\n"))
-            if not 1 < lad_type <= 5:
+            if not 1 <= lad_type <= 5:
                 raise IndexError
             break
         except ValueError:
