@@ -15,9 +15,12 @@ import random
 from pygame import *
 
 
+# Class that contains the majority of code in it. Instantiated for each player.
 class Lad:
+    # class var for file names.
     ladTypes = ['bus_', 'col_', 'bar_', 'sci_', 'art_']
 
+    # Initializes all the values for each lad
     def __init__(self, name, kind, side):
         self.name = name
         self.kind = Lad.ladTypes[kind]
@@ -29,30 +32,34 @@ class Lad:
                                 "Lifestyle": ['Wealth', 'Health', 'Social'],
                                 "Vibe": ['Personality', 'GenVibe'],
                                 "Mindset": ['Intel', 'Aspiration']}
+
+        # FILE READING SECTION - extracts character data from designated file
+        # Cheat code (Easter egg) to guarantee Artist_1 character
         if self.kind == 'art_' and self.name == 'Karen':
             self.fileName = f"Characters/art_1.txt"
         else:
+            # Selects random character from 3 in each category
             self.fileName = f"Characters/{self.kind}{random.randint(1, 3)}.txt"
 
         file = open(self.fileName, 'r')
         self.dataLines = file.readlines()
 
+        # Makes data more usable
         for Line in range(len(self.dataLines) - 1):
             self.dataLines[Line] = self.dataLines[Line].strip()
 
+        # Unnecessary split, intended for later use with custom voices
         firstVals = self.dataLines[0].split()
         self.image = image.load("images/" + firstVals[0])
-        # self.sound = firstVals[1]
+        # self.sound = firstVals[1] - will be added later
+        # Flips image if needed
         if self.side:
             self.image = transform.flip(self.image, True, False)
         self.Compliments = [self.dataLines[1].split(), self.dataLines[2].split()]
         self.Lines = [self.dataLines[i] for i in range(3, 7)]
         file.close()
 
-    def getKind(self):
-        typeNames = ['Businessperson', 'College Student', 'Bartender', 'Scientist', 'Artist']
-        return typeNames[Lad.ladTypes.index(self.kind)]
-
+    # Clears empty dictionary keys, returns list of remaining keys
     def getOptions(self):
         toDel = []
         for sect in self.All_Compliments.keys():
@@ -62,18 +69,21 @@ class Lad:
             self.All_Compliments.pop(item, None)
         return list(self.All_Compliments.keys())
 
+    # Draws character image, considering its side
     def drawCharacter(self):
         if not self.side:
             win.blit(self.image, (320, -5))
         else:
             win.blit(self.image, (0, -5))
 
+    # Draws buttons for each available category of compliment
     def drawOptions(self):
         offset = 30 + self.side * 180
         for i, j in enumerate(self.getOptions()):
             win.blit(btn, (offset + i * 80, 270))
             win.blit(text.render(j, True, (0, 0, 0)), (offset + 5 + i * 80 + (10 - len(j)) * 2, 277))
 
+    # Receives position of mouse on clicks, returns what button was pressed, if any
     def checkClick(self, mPos):
         offset = 30 + self.side * 180
         if 270 <= mPos[1] <= 292:
@@ -82,6 +92,7 @@ class Lad:
                     return i
             return None
 
+    # Draws flatter bar shell and flatter bar
     def drawBar(self):
         if self.side:
             x = 620
@@ -91,10 +102,13 @@ class Lad:
         win.blit(bar, (x, 30))
         draw.rect(win, (240, 194, 96), Rect(x + 6, 269 - BARPOS, 7, BARPOS))
 
+    # Line can be str or int. Receives code for line to say, and side to display the message. Default is self.side
     def sayLine(self, line, side=None):
         if side is None:
             side = self.side
-
+    # Line is encoded as follows:
+        # If line is an int, positive lines are included in the txt file, and negatives are default responses
+        # If line is a str, all possible lines are in the designated file in genLines
         if type(line) == int:
             if line >= 0:
                 Line = self.Lines[line]
@@ -105,22 +119,28 @@ class Lad:
             Line = random.choice(f.readlines())
             f.close()
 
+        # Begin Text Phase
         step = 0
         waitFrame = 0
         while True:
+            # Waiting after text is finished
             if step is None:
                 waitFrame += 1
                 if waitFrame == 24:
                     break
+            # Draw everything
             bg.draw()
             P[cP].drawBar()
             P[cP].drawCharacter()
+
+            # Call writeSpeech
             if side:
                 Coord = (265, 260)
             else:
                 Coord = (100, 260)
             step = writeSpeech(Line, step, self.name, Coord, None)
 
+            # Standard quit even and Dialog Skip
             for Event in event.get():
                 if Event.type == QUIT:
                     quit()
@@ -133,34 +153,38 @@ class Lad:
             display.update()
             Clock.tick(12)
 
+    # Receives category for compliment, chooses random subject and evals score gained. Returns status code and response.
     def Compliment(self, Sub):
         All_Subjects = self.getOptions()
         subject = random.choice(self.All_Compliments[All_Subjects[Sub]])
         print('subject: ', subject)
         P[1 - cP].sayLine(subject, self.side)
 
+        # If sub is a good compliment, gain score based on how recent it is in the list
         if subject in self.Compliments[0]:
             self.fMeter += round(30 - 3.75 * self.Compliments[0].index(subject))
 
+            # If win conditions are met, return win code
             if self.fMeter >= 100:
-                status = [2, self.Lines[2]]
+                status = 2
             else:
-                status = [1, None]
-
+                status = 1
+            # Prevents repetition by removing used subjects
             self.Compliments[0].remove(subject)
+        # If sub is a bad compliment, lose score based on how recent it is in the list
         else:
             self.fMeter -= round(self.Compliments[1].index(subject) * 6)
             if self.fMeter < 0:
                 self.fMeter = 0
-
+            # If lose condition is selected, return lose code
             if subject == self.Compliments[1][-1]:
                 self.fMeter = -1
-                status = [-2, self.Lines[3]]
+                status = -2
             else:
-                status = [-1, None]
-
+                status = -1
+            # Prevents repetition by removing used subjects
             self.Compliments[1].remove(subject)
-
+        # Removes subject from main dictionary
         for sect in list(self.All_Compliments.keys()):
             if subject in self.All_Compliments[sect]:
                 self.All_Compliments[sect].remove(subject)
@@ -168,6 +192,7 @@ class Lad:
         return status
 
 
+# Class BackGround - simplifies animating the GIF and keeps track of the frames
 class BG:
     def __init__(self):
         self.frame = 0
@@ -180,18 +205,24 @@ class BG:
             self.frame = 0
 
 
+# Global function for writing speech bubbles, mostly used for objects but initially made global
+# Takes in text, iteration of text, speaker and coordinates (Sound is none for now)
+# Function draws speech bubble, and iterates through text.
+# Note: Due to iteration, manual enters must be made. The function supports exactly 3 lines.
 def writeSpeech(Text, Iter, Speak, Coord, Sound):
     cX, cY = Coord
     win.blit(box, (cX - 20, cY - 30))
     win.blit(text.render(Speak + ' :', True, (0, 0, 0)), (cX, cY - 20))
-    Text = Text.split('~')
+    Text = Text.split('~')  # ~ is used as \n
 
+    # If iteration is done, write all text.
     if Iter is None:
         win.blit(text.render(Text[0], True, (0, 0, 0)), (cX, cY))
         win.blit(text.render(Text[1], True, (0, 0, 0)), (cX, cY + 10))
         win.blit(text.render(Text[2], True, (0, 0, 0)), (cX, cY + 20))
         return None
 
+    # Write lines
     if Iter < len(Text[0]):
         if Text[0][Iter].isalpha():
             speak.play()
@@ -208,17 +239,21 @@ def writeSpeech(Text, Iter, Speak, Coord, Sound):
         win.blit(text.render(Text[1], True, (0, 0, 0)), (cX, cY + 10))
         win.blit(text.render(Text[2][0:Iter - len(Text[0] + Text[1])], True, (0, 0, 0)), (cX, cY + 20))
 
+    # If iteration is past the length of text, end iteration. Else, add 1
     elif Iter >= len(Text[0] + Text[1] + Text[2]):
         return None
     return Iter + 1
 
 
+# Function to draw player indicator
 def drawPlayer(p):
     x = 320 - 200 * p
     win.blit(pBox, (x, 10))
     win.blit(text.render(f'Your turn, Player {p + 1}', True, (0, 0, 0)), (x + 10, 15))
 
 
+# Lad creating section (user input)
+# Section ensures that lad_type is an int between 1 and 5
 P = []
 for i in range(2):
     lad_name = input(f"Player {1 + i}: \nSelect Lad Name:\n")
@@ -230,7 +265,7 @@ for i in range(2):
                                  "3: Bartender, "
                                  "4:Scientist, "
                                  "5: Artist :\n"))
-            if lad_type > 5:
+            if not 1 < lad_type < 5:
                 raise IndexError
             break
         except ValueError:
@@ -240,6 +275,7 @@ for i in range(2):
 
     P.append(Lad(lad_name, lad_type, i))
 
+# Initialize all pygame values, and load images.
 init()
 win = display.set_mode((640, 314))
 btn = image.load('images/btn.png')
@@ -248,10 +284,12 @@ text = font.Font("FONT.ttf", 6)
 box = image.load('images/tBox.png')
 pBox = image.load('images/pBox.png')
 
+# Create clock, sound and BG
 speak = mixer.Sound('speak.wav')
 Clock = time.Clock()
 bg = BG()
 
+# Prepare all good and bad responses
 f = open('genLines/good.txt', 'r')
 Good_Lines = [i for i in f.readlines()]
 f.close()
@@ -270,6 +308,7 @@ P[1].sayLine(0)
 GAME = True
 RESULT = None
 while GAME:
+    # Draw all relevant assets
     bg.draw()
     P[cP].drawCharacter()
     P[cP].drawOptions()
@@ -277,37 +316,42 @@ while GAME:
     drawPlayer(1 - cP)
 
     for Event in event.get():
+        # Standard quit loop
         if Event.type == QUIT:
             quit()
+
+        # Detects click, sends data to Lad objects, and acts on result
+        # Result data is encoded as follows:
+            # -1 and 1 are standard bad and good results, causing a standard bad or good response;
+            # -2 and 2 are losing and winning results, breaking the loop and moving on to next phase.
         elif Event.type == MOUSEBUTTONUP:
             sub = P[cP].checkClick(mouse.get_pos())
             if sub is not None:
                 result = P[cP].Compliment(sub)
-                if result[0] == 1:
+                if result == 1:
                     P[cP].sayLine(-2)
-                elif result[0] == -1:
+                elif result == -1:
                     P[cP].sayLine(-1)
 
-                elif result[0] == 2:
+                elif result == 2:
                     P[cP].sayLine(2)
                     cP = 1 - cP
                     P[cP].sayLine(1)
                     RESULT = (cP + 1, 1)
                     GAME = False
-                elif result[0] == -2:
+                elif result == -2:
                     P[cP].sayLine(3)
                     RESULT = (cP + 1, 2)
                     GAME = False
                 cP = 1 - cP
-
     display.update()
     Clock.tick(12)
 
 # Conclusion section
-
+# load images based on result
 msg = image.load(f'images/win{RESULT[0]}.png')
 res = image.load(f'images/result{RESULT[1]}.png')
-
+# Draws relevant assets, and closes on click
 while True:
     bg.draw()
     win.blit(msg, (0, 0))
@@ -315,6 +359,8 @@ while True:
 
     for Event in event.get():
         if Event.type == QUIT:
+            quit()
+        if Event.type == MOUSEBUTTONUP:
             quit()
     display.update()
     Clock.tick(12)
