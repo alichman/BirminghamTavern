@@ -8,8 +8,8 @@
 #            Selecting the Lose-Condition makes the complimenting lad to lose the game.
 #            For all other compliments, the Lad will be flattered based on the compliment's ranking
 #            in the Lad's text file
-# Personality consultants: Carolinne, Iza, Danell, Olivia
-# Graphics consultants: Carolinne, Lauren
+# Personality consultants: Carolinne, Iza, Danell, Olivia, Levente
+# Graphics consultants: Carolinne, Lauren, Levente
 
 import random
 from pygame import *
@@ -193,11 +193,17 @@ def writeSpeech(Text, Iter, Speak, Coord, Sound):
         return None
 
     if Iter < len(Text[0]):
+        if Text[0][Iter].isalpha():
+            speak.play()
         win.blit(text.render(Text[0][0:Iter], True, (0, 0, 0)), (cX, cY))
     elif Iter < len(Text[1] + Text[0]):
+        if Text[1][Iter - len(Text[0])].isalpha():
+            speak.play()
         win.blit(text.render(Text[0], True, (0, 0, 0)), (cX, cY))
         win.blit(text.render(Text[1][0:Iter - len(Text[0])], True, (0, 0, 0)), (cX, cY + 10))
     elif Iter < len(Text[0] + Text[1] + Text[2]):
+        if Text[2][Iter - len(Text[1]) - len(Text[0])].isalpha():
+            speak.play()
         win.blit(text.render(Text[0], True, (0, 0, 0)), (cX, cY))
         win.blit(text.render(Text[1], True, (0, 0, 0)), (cX, cY + 10))
         win.blit(text.render(Text[2][0:Iter - len(Text[0] + Text[1])], True, (0, 0, 0)), (cX, cY + 20))
@@ -208,19 +214,31 @@ def writeSpeech(Text, Iter, Speak, Coord, Sound):
 
 
 def drawPlayer(p):
-    x = 120 + 200 * p
-    win.blit(box, (x, 10))
-    win.blit(text.render(f'Your turn, Player {p + 1}', True, (0, 0, 0)), (x+20, 30))
+    x = 320 - 200 * p
+    win.blit(pBox, (x, 10))
+    win.blit(text.render(f'Your turn, Player {p + 1}', True, (0, 0, 0)), (x + 10, 15))
 
 
-P = [Lad(input(f"Player {1 + i}: \nSelect Lad Name:\n"),
-         int(input("Select Lad Type \n1: Business, "
-                   "2: College Student, "
-                   "3: Bartender, "
-                   "4:Scientist, "
-                   "5: Artist :\n")) - 1, i) for i in range(2)]
+P = []
+for i in range(2):
+    lad_name = input(f"Player {1 + i}: \nSelect Lad Name:\n")
+    while True:
+        try:
+            lad_type = int(input("Select Lad Type \n"
+                                 "1: Business, "
+                                 "2: College Student, "
+                                 "3: Bartender, "
+                                 "4:Scientist, "
+                                 "5: Artist :\n"))
+            if lad_type > 5:
+                raise IndexError
+            break
+        except ValueError:
+            print("Lad Type must be an integer from 1 to 5.")
+        except IndexError:
+            print("-----------\nLad Type must be an integer from 1 to 5.\n")
 
-waitFrame = 0
+    P.append(Lad(lad_name, lad_type, i))
 
 init()
 win = display.set_mode((640, 314))
@@ -228,6 +246,9 @@ btn = image.load('images/btn.png')
 bar = image.load('images/bar.png')
 text = font.Font("FONT.ttf", 6)
 box = image.load('images/tBox.png')
+pBox = image.load('images/pBox.png')
+
+speak = mixer.Sound('speak.wav')
 Clock = time.Clock()
 bg = BG()
 
@@ -253,7 +274,7 @@ while GAME:
     P[cP].drawCharacter()
     P[cP].drawOptions()
     P[cP].drawBar()
-    drawPlayer(cP)
+    drawPlayer(1 - cP)
 
     for Event in event.get():
         if Event.type == QUIT:
@@ -266,14 +287,15 @@ while GAME:
                     P[cP].sayLine(-2)
                 elif result[0] == -1:
                     P[cP].sayLine(-1)
-                elif result[0] == -2:
-                    P[cP].sayLine(3)
-                    RESULT = (cP + 1, 1)
-                    GAME = False
+
                 elif result[0] == 2:
                     P[cP].sayLine(2)
                     cP = 1 - cP
                     P[cP].sayLine(1)
+                    RESULT = (cP + 1, 1)
+                    GAME = False
+                elif result[0] == -2:
+                    P[cP].sayLine(3)
                     RESULT = (cP + 1, 2)
                     GAME = False
                 cP = 1 - cP
@@ -283,13 +305,13 @@ while GAME:
 
 # Conclusion section
 
-res = image.load(f'images/result{RESULT[1]}.png')
 msg = image.load(f'images/win{RESULT[0]}.png')
+res = image.load(f'images/result{RESULT[1]}.png')
 
 while True:
     bg.draw()
-    win.blit(res, (0, 0))
     win.blit(msg, (0, 0))
+    win.blit(res, (0, 0))
 
     for Event in event.get():
         if Event.type == QUIT:
