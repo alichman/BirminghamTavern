@@ -278,6 +278,7 @@ for i in range(2):
 # Initialize all pygame values, and load images.
 init()
 win = display.set_mode((640, 314))
+display.set_caption('Birmingham Tavern')
 btn = image.load('images/btn.png')
 bar = image.load('images/bar.png')
 text = font.Font("FONT.ttf", 6)
