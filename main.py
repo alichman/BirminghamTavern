@@ -42,7 +42,7 @@ class Lad:
 
         firstVals = self.dataLines[0].split()
         self.image = image.load("images/" + firstVals[0])
-        #self.sound = firstVals[1]
+        # self.sound = firstVals[1]
         if self.side:
             self.image = transform.flip(self.image, True, False)
         self.Compliments = [self.dataLines[1].split(), self.dataLines[2].split()]
@@ -207,6 +207,12 @@ def writeSpeech(Text, Iter, Speak, Coord, Sound):
     return Iter + 1
 
 
+def drawPlayer(p):
+    x = 120 + 200 * p
+    win.blit(box, (x, 10))
+    win.blit(text.render(f'Your turn, Player {p + 1}', True, (0, 0, 0)), (x+20, 30))
+
+
 P = [Lad(input(f"Player {1 + i}: \nSelect Lad Name:\n"),
          int(input("Select Lad Type \n1: Business, "
                    "2: College Student, "
@@ -241,11 +247,14 @@ P[1].sayLine(0)
 
 # GAME PHASE
 GAME = True
+RESULT = None
 while GAME:
     bg.draw()
     P[cP].drawCharacter()
     P[cP].drawOptions()
     P[cP].drawBar()
+    drawPlayer(cP)
+
     for Event in event.get():
         if Event.type == QUIT:
             quit()
@@ -255,17 +264,35 @@ while GAME:
                 result = P[cP].Compliment(sub)
                 if result[0] == 1:
                     P[cP].sayLine(-2)
-                elif result[0] == 2:
-                    P[cP].sayLine(2)
-                    cP = 1 - cP
-                    P[cP].sayLine(1)
-                    GAME = False
                 elif result[0] == -1:
                     P[cP].sayLine(-1)
                 elif result[0] == -2:
                     P[cP].sayLine(3)
+                    RESULT = (cP + 1, 1)
+                    GAME = False
+                elif result[0] == 2:
+                    P[cP].sayLine(2)
+                    cP = 1 - cP
+                    P[cP].sayLine(1)
+                    RESULT = (cP + 1, 2)
                     GAME = False
                 cP = 1 - cP
 
+    display.update()
+    Clock.tick(12)
+
+# Conclusion section
+
+res = image.load(f'images/result{RESULT[1]}.png')
+msg = image.load(f'images/win{RESULT[0]}.png')
+
+while True:
+    bg.draw()
+    win.blit(res, (0, 0))
+    win.blit(msg, (0, 0))
+
+    for Event in event.get():
+        if Event.type == QUIT:
+            quit()
     display.update()
     Clock.tick(12)
