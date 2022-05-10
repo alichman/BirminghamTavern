@@ -8,7 +8,7 @@
 #            Selecting the Lose-Condition makes the complimenting lad to lose the game.
 #            For all other compliments, the Lad will be flattered based on the compliment's ranking
 #            in the Lad's text file
-# Personality consultants: Carolinne, Iza, Danell, Olivia, Levente
+# Personality consultants: Carolinne, Iza, Danell, Olivia, Levente, Holly
 # Graphics consultants: Carolinne, Lauren, Levente
 
 import random
@@ -265,15 +265,15 @@ for i in range(2):
                                  "3: Bartender, "
                                  "4:Scientist, "
                                  "5: Artist :\n"))
-            if not 1 < lad_type < 5:
+            if not 1 < lad_type <= 5:
                 raise IndexError
             break
         except ValueError:
-            print("Lad Type must be an integer from 1 to 5.")
+            print("-----------\nLad Type must be an integer from 1 to 5.\n")
         except IndexError:
             print("-----------\nLad Type must be an integer from 1 to 5.\n")
 
-    P.append(Lad(lad_name, lad_type, i))
+    P.append(Lad(lad_name, lad_type-1, i))
 
 # Initialize all pygame values, and load images.
 init()
