@@ -194,9 +194,9 @@ class Lad:
 
 # Class BackGround - simplifies animating the GIF and keeps track of the frames
 class BG:
-    def __init__(self):
+    def __init__(self, folder):
         self.frame = 0
-        self.images = [image.load(f'BG/{i}.png') for i in range(12)]
+        self.images = [image.load(f'{folder}/{i}.png') for i in range(12)]
 
     def draw(self):
         win.blit(self.images[self.frame // 2], (0, 0))
@@ -288,7 +288,8 @@ pBox = image.load('images/pBox.png')
 # Create clock, sound and BG
 speak = mixer.Sound('speak.wav')
 Clock = time.Clock()
-bg = BG()
+bg = BG('BG')
+mn = BG('Menu')
 
 # Prepare all good and bad responses
 f = open('genLines/good.txt', 'r')
