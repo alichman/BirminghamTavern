@@ -252,6 +252,11 @@ def drawPlayer(p):
     win.blit(text.render(f'Your turn, Player {p + 1}', True, (0, 0, 0)), (x + 10, 15))
 
 
+ALL_KEYS = {K_a: 'a', K_b: 'b', K_c: 'c', K_d: 'd', K_e: 'e', K_f: 'f', K_g: 'g',
+            K_h: 'h', K_i: 'i', K_j: 'j', K_k: 'k', K_l: 'l', K_m: 'm', K_n: 'n',
+            K_o: 'o', K_p: 'p', K_q: 'q', K_r: 'r', K_s: 's', K_t: 't', K_u: 'u',
+            K_v: 'v', K_w: 'w', K_x: 'x', K_y: 'y', K_z: 'z'}
+
 # Initialize all pygame values, and load images.
 init()
 win = display.set_mode((640, 314))
@@ -259,6 +264,7 @@ display.set_caption('Birmingham Tavern')
 btn = image.load('images/btn.png')
 bar = image.load('images/bar.png')
 text = font.Font("FONT.ttf", 6)
+TEXT = font.Font("FONT.ttf", 12)
 box = image.load('images/tBox.png')
 pBox = image.load('images/pBox.png')
 
@@ -295,7 +301,8 @@ while MENU:
     display.update()
     Clock.tick(12)
 
-for i in range(24):
+# Wait a second
+for i in range(12):
     win.fill((0,0,0))
     for Event in event.get():
         # Standard quit loop
@@ -305,17 +312,44 @@ for i in range(24):
     Clock.tick(12)
 
 # CHAR SELECT PHASE
-
-# Lad creating section (user input)
-# Section ensures that lad_type is an int between 1 and 5
 sil = image.load('images/sil.png')
 P = []
 for i in range(2):
+    NAME = ''
     while True:
         bg.draw()
-        win.blit(sil, (320*(1-i), -5))
-        for i, j in enumerate(Lad.ladTypes):
-            win.blit
+        win.blit(image.load('images/scientist_1.png'), (320*(1-i), -5))
+        win.blit(pBox, (30 + i*180, 30))
+        win.blit(text.render(NAME,True, (0,0,0)),(35 + i*180, 35))
+        for Event in event.get():
+            # Standard quit loop
+            if Event.type == QUIT:
+                quit()
+            if Event.type == KEYDOWN:
+                if Event.key in ALL_KEYS.keys():
+                    NAME += ALL_KEYS[Event.key]
+        display.update()
+        Clock.tick(12)
+    while True:
+        bg.draw()
+        win.blit(image.load('images/scientist_1.png'), (320*(1-i), -5))
+
+        win.blit(pBox, (30 + i*180, 30))
+        win.blit(text.render("=Name", True, (0, 0, 0)), (40 + 180*i, 35))
+        win.blit(TEXT.render("SELECT TYPE", True, (0, 0, 0)), (28 + 180 * i, 132))
+        win.blit(TEXT.render("SELECT TYPE", True, (245, 217, 157)), (30 + 180*i, 130))
+
+        for k, j in enumerate(["Businesslad", "College Student", "Bartender", "Scientist", "Artist"]):
+            win.blit(pBox, (30 + i * 180, 270-30*k))
+            win.blit(text.render(j, True, (0, 0, 0)), (40 + i * 180, 277 - 30*k))
+
+
+        for Event in event.get():
+            # Standard quit loop
+            if Event.type == QUIT:
+                quit()
+        display.update()
+        Clock.tick(12)
 
 
 cP = 0
