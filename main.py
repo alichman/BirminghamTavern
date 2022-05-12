@@ -106,7 +106,7 @@ class Lad:
     def sayLine(self, line, side=None):
         if side is None:
             side = self.side
-        # Line is encoded as follows:
+    # Line is encoded as follows:
         # If line is an int, positive lines are included in the txt file, and negatives are default responses
         # If line is a str, all possible lines are in the designated file in genLines
         if type(line) == int:
@@ -252,29 +252,6 @@ def drawPlayer(p):
     win.blit(text.render(f'Your turn, Player {p + 1}', True, (0, 0, 0)), (x + 10, 15))
 
 
-# Lad creating section (user input)
-# Section ensures that lad_type is an int between 1 and 5
-P = []
-for i in range(2):
-    lad_name = input(f"Player {1 + i}: \nSelect Lad Name:\n")
-    while True:
-        try:
-            lad_type = int(input("Select Lad Type \n"
-                                 "1: Business, "
-                                 "2: College Student, "
-                                 "3: Bartender, "
-                                 "4:Scientist, "
-                                 "5: Artist :\n"))
-            if not 1 <= lad_type <= 5:
-                raise IndexError
-            break
-        except ValueError:
-            print("-----------\nLad Type must be an integer from 1 to 5.\n")
-        except IndexError:
-            print("-----------\nLad Type must be an integer from 1 to 5.\n")
-
-    P.append(Lad(lad_name, lad_type - 1, i))
-
 # Initialize all pygame values, and load images.
 init()
 win = display.set_mode((640, 314))
@@ -301,6 +278,8 @@ Bad_Lines = [i for i in f.readlines()]
 f.close()
 
 # MAIN MENU
+
+
 MENU = True
 while MENU:
     mn.draw()
@@ -311,13 +290,13 @@ while MENU:
             quit()
         elif Event.type == MOUSEBUTTONUP:
             mouseX, mouseY = mouse.get_pos()
-            if 400 < mouseX < 590 and 115 < mouseY < 310:
+            if 400<mouseX<590 and 115<mouseY<310:
                 MENU = False
     display.update()
     Clock.tick(12)
 
 for i in range(24):
-    win.fill((0, 0, 0))
+    win.fill((0,0,0))
     for Event in event.get():
         # Standard quit loop
         if Event.type == QUIT:
@@ -325,7 +304,20 @@ for i in range(24):
     display.update()
     Clock.tick(12)
 
-# INTRODUCTION PHASE
+# CHAR SELECT PHASE
+
+# Lad creating section (user input)
+# Section ensures that lad_type is an int between 1 and 5
+sil = image.load('images/sil.png')
+P = []
+for i in range(2):
+    while True:
+        bg.draw()
+        win.blit(sil, (320*(1-i), -5))
+        for i, j in enumerate(Lad.ladTypes):
+            win.blit
+
+
 cP = 0
 P[0].sayLine(0)
 cP = 1
@@ -347,10 +339,10 @@ while GAME:
         if Event.type == QUIT:
             quit()
 
-        # Detects click, sends data to Lad objects, and acts on result
+        # Detects click, sends data to Lad objects, and acts on result.
         # Result data is encoded as follows:
-        # -1 and 1 are standard bad and good results, causing a standard bad or good response;
-        # -2 and 2 are losing and winning results, breaking the loop and moving on to next phase.
+            # -1 and 1 are standard bad and good results, causing a standard bad or good response;
+            # -2 and 2 are losing and winning results, breaking the loop and moving on to next phase.
         elif Event.type == MOUSEBUTTONUP:
             sub = P[cP].checkClick(mouse.get_pos())
             if sub is not None:
