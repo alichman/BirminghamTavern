@@ -106,7 +106,7 @@ class Lad:
     def sayLine(self, line, side=None):
         if side is None:
             side = self.side
-    # Line is encoded as follows:
+        # Line is encoded as follows:
         # If line is an int, positive lines are included in the txt file, and negatives are default responses
         # If line is a str, all possible lines are in the designated file in genLines
         if type(line) == int:
@@ -273,7 +273,7 @@ for i in range(2):
         except IndexError:
             print("-----------\nLad Type must be an integer from 1 to 5.\n")
 
-    P.append(Lad(lad_name, lad_type-1, i))
+    P.append(Lad(lad_name, lad_type - 1, i))
 
 # Initialize all pygame values, and load images.
 init()
@@ -300,6 +300,31 @@ f = open('genLines/bad.txt', 'r')
 Bad_Lines = [i for i in f.readlines()]
 f.close()
 
+# MAIN MENU
+MENU = True
+while MENU:
+    mn.draw()
+
+    for Event in event.get():
+        # Standard quit loop
+        if Event.type == QUIT:
+            quit()
+        elif Event.type == MOUSEBUTTONUP:
+            mouseX, mouseY = mouse.get_pos()
+            if 400 < mouseX < 590 and 115 < mouseY < 310:
+                MENU = False
+    display.update()
+    Clock.tick(12)
+
+for i in range(24):
+    win.fill((0, 0, 0))
+    for Event in event.get():
+        # Standard quit loop
+        if Event.type == QUIT:
+            quit()
+    display.update()
+    Clock.tick(12)
+
 # INTRODUCTION PHASE
 cP = 0
 P[0].sayLine(0)
@@ -324,8 +349,8 @@ while GAME:
 
         # Detects click, sends data to Lad objects, and acts on result
         # Result data is encoded as follows:
-            # -1 and 1 are standard bad and good results, causing a standard bad or good response;
-            # -2 and 2 are losing and winning results, breaking the loop and moving on to next phase.
+        # -1 and 1 are standard bad and good results, causing a standard bad or good response;
+        # -2 and 2 are losing and winning results, breaking the loop and moving on to next phase.
         elif Event.type == MOUSEBUTTONUP:
             sub = P[cP].checkClick(mouse.get_pos())
             if sub is not None:
