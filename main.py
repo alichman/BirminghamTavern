@@ -261,6 +261,8 @@ text = font.Font("FONT.ttf", 6)
 TEXT = font.Font("FONT.ttf", 12)
 box = image.load('images/tBox.png')
 pBox = image.load('images/pBox.png')
+hBtn = image.load('images/help.png')
+Help = image.load('images/bigHelp.png')
 
 # Create clock, sound and BG
 speak = mixer.Sound('speak.wav')
@@ -288,8 +290,12 @@ ALL_KEYS = {K_a: 'a', K_b: 'b', K_c: 'c', K_d: 'd', K_e: 'e', K_f: 'f', K_g: 'g'
 
 
 MENU = True
+HELP = False
 while MENU:
     mn.draw()
+    win.blit(hBtn, (0,0))
+    if HELP:
+        win.blit(Help, (0,0))
 
     for Event in event.get():
         # Standard quit loop
@@ -297,8 +303,14 @@ while MENU:
             quit()
         elif Event.type == MOUSEBUTTONUP:
             mouseX, mouseY = mouse.get_pos()
-            if 400<mouseX<590 and 115<mouseY<310:
-                MENU = False
+            if HELP:
+                HELP = False
+            else:
+                if 400<mouseX<590 and 115<mouseY<310:
+                    MENU = False
+                elif 550<mouseX<640 and 18<mouseY<56:
+                    print('help')
+                    HELP = True
     display.update()
     Clock.tick(12)
 
