@@ -157,7 +157,6 @@ class Lad:
     def Compliment(self, Sub):
         All_Subjects = self.getOptions()
         subject = random.choice(self.All_Compliments[All_Subjects[Sub]])
-        print('subject: ', subject)
         P[1 - cP].sayLine(subject, self.side)
 
         # If sub is a good compliment, gain score based on how recent it is in the list
@@ -337,6 +336,8 @@ for i in range(2):
                         NAME += ALL_KEYS[Event.key]
                 elif Event.key == K_RETURN:
                     NSELECT = False
+                elif Event.key == K_BACKSPACE:
+                    NAME = NAME[:-1]
 
         display.update()
         Clock.tick(12)
