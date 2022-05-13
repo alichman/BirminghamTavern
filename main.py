@@ -38,8 +38,12 @@ class Lad:
         if self.kind == 'art_' and self.name == 'Karen':
             self.fileName = f"Characters/art_1.txt"
         else:
+            index = random.randint(1,3)
+            if self.side and self.kind == P[0].getChar()[0]:
+                while str(index) == P[0].getChar()[1]:
+                    index = random.randint(1, 3)
             # Selects random character from 3 in each category
-            self.fileName = f"Characters/{self.kind}{random.randint(1, 3)}.txt"
+            self.fileName = f"Characters/{self.kind}{index}.txt"
 
         file = open(self.fileName, 'r')
         self.dataLines = file.readlines()
@@ -58,6 +62,10 @@ class Lad:
         self.Compliments = [self.dataLines[1].split(), self.dataLines[2].split()]
         self.Lines = [self.dataLines[i] for i in range(3, 7)]
         file.close()
+
+    def getChar(self):
+        toReturn = self.fileName.split('/')[1].split('_')
+        return [toReturn[0]+'_', toReturn[1][:-4]]
 
     # Clears empty dictionary keys, returns list of remaining keys
     def getOptions(self):
@@ -286,169 +294,175 @@ ALL_KEYS = {K_a: 'a', K_b: 'b', K_c: 'c', K_d: 'd', K_e: 'e', K_f: 'f', K_g: 'g'
             K_3: '3', K_4: '4', K_5: '5', K_6: '6', K_7: '7', K_8: '8', K_9: '9',
             K_0: '0', K_MINUS: '-', K_UNDERSCORE: '_'}
 
-# MAIN MENU
 
+# FULL GAME LOOP -----
+while True:
+    # MAIN MENU
+    MENU = True
+    HELP = False
+    while MENU:
+        mn.draw()
+        win.blit(hBtn, (0,0))
+        if HELP:
+            win.blit(Help, (0,0))
 
-MENU = True
-HELP = False
-while MENU:
-    mn.draw()
-    win.blit(hBtn, (0,0))
-    if HELP:
-        win.blit(Help, (0,0))
-
-    for Event in event.get():
-        # Standard quit loop
-        if Event.type == QUIT:
-            quit()
-        elif Event.type == MOUSEBUTTONUP:
-            mouseX, mouseY = mouse.get_pos()
-            if HELP:
-                HELP = False
-            else:
-                if 400<mouseX<590 and 115<mouseY<310:
-                    MENU = False
-                elif 550<mouseX<640 and 18<mouseY<56:
-                    print('help')
-                    HELP = True
-    display.update()
-    Clock.tick(12)
-
-# Wait a second
-for i in range(12):
-    win.fill((0,0,0))
-    for Event in event.get():
-        # Standard quit loop
-        if Event.type == QUIT:
-            quit()
-    display.update()
-    Clock.tick(12)
-
-# CHAR SELECT PHASE
-sil = [image.load('images/sil.png'), transform.flip(image.load('images/sil.png'), True, False)]
-P = []
-for i in range(2):
-    # NAME SELECTION
-    NAME = ''
-    NSELECT = True
-    while NSELECT:
-        bg.draw()
-        win.blit(sil[i], (340*(1-i), 15))
-        win.blit(pBox, (30 + i*414, 30))
-        win.blit(text.render(NAME,True, (0,0,0)),(35 + i*414, 35))
-        win.blit(TEXT.render("ENTER NAME", True, (0, 0, 0)), (30 + 414 * i, 62))
-        win.blit(TEXT.render("ENTER NAME", True, (245, 217, 157)), (32 + 414 * i, 60))
         for Event in event.get():
             # Standard quit loop
             if Event.type == QUIT:
                 quit()
-            if Event.type == KEYDOWN:
-                if Event.key in ALL_KEYS.keys():
-                    if len(NAME) < 22:
-                        NAME += ALL_KEYS[Event.key]
-                elif Event.key == K_RETURN:
-                    NSELECT = False
-                elif Event.key == K_BACKSPACE:
-                    NAME = NAME[:-1]
-
+            elif Event.type == MOUSEBUTTONUP:
+                mouseX, mouseY = mouse.get_pos()
+                if HELP:
+                    HELP = False
+                else:
+                    if 400<mouseX<590 and 115<mouseY<310:
+                        MENU = False
+                    elif 550<mouseX<640 and 18<mouseY<56:
+                        HELP = True
         display.update()
         Clock.tick(12)
 
-    # TYPE SELECTION
-    TYPE = None
-    TSELECT = True
-    while TSELECT:
+    # Wait a second
+    for i in range(12):
+        win.fill((0,0,0))
+        for Event in event.get():
+            # Standard quit loop
+            if Event.type == QUIT:
+                quit()
+        display.update()
+        Clock.tick(12)
+
+    # CHAR SELECT PHASE
+    sil = [image.load('images/sil.png'), transform.flip(image.load('images/sil.png'), True, False)]
+    P = []
+    for i in range(2):
+        # NAME SELECTION
+        NAME = ''
+        NSELECT = True
+        while NSELECT:
+            bg.draw()
+            win.blit(sil[i], (340*(1-i), 15))
+            win.blit(pBox, (30 + i*414, 30))
+            win.blit(text.render(NAME,True, (0,0,0)),(35 + i*414, 35))
+            win.blit(TEXT.render("ENTER NAME", True, (0, 0, 0)), (30 + 414 * i, 62))
+            win.blit(TEXT.render("ENTER NAME", True, (245, 217, 157)), (32 + 414 * i, 60))
+            for Event in event.get():
+                # Standard quit loop
+                if Event.type == QUIT:
+                    quit()
+                if Event.type == KEYDOWN:
+                    if Event.key in ALL_KEYS.keys():
+                        if len(NAME) < 22:
+                            NAME += ALL_KEYS[Event.key]
+                    elif Event.key == K_RETURN:
+                        NSELECT = False
+                    elif Event.key == K_BACKSPACE:
+                        NAME = NAME[:-1]
+
+            display.update()
+            Clock.tick(12)
+
+        # TYPE SELECTION
+        TYPE = None
+        TSELECT = True
+        while TSELECT:
+            bg.draw()
+            win.blit(sil[i], (340*(1-i), 15))
+
+            win.blit(pBox, (30 + i*414, 30))
+            win.blit(text.render(NAME, True, (0, 0, 0)), (35 + 414*i, 35))
+            win.blit(TEXT.render("SELECT TYPE", True, (0, 0, 0)), (28 + 414 * i, 132))
+            win.blit(TEXT.render("SELECT TYPE", True, (245, 217, 157)), (30 + 414*i, 130))
+
+            for k, j in enumerate(["Businesslad", "College Student", "Bartender", "Scientist", "Artist"]):
+                win.blit(pBox, (30 + i * 414, 270-30*k))
+                win.blit(text.render(j, True, (0, 0, 0)), (40 + i * 414, 277 - 30*k))
+
+            for Event in event.get():
+                # Standard quit loop
+                if Event.type == QUIT:
+                    quit()
+                if Event.type == MOUSEBUTTONUP:
+                    mX, mY = mouse.get_pos()
+                    if 40 + i * 414 < mX < 206 + i * 414:
+                        for k in range(5):
+                            if 266 - 30*k < mY < 290 - 30*k:
+                                TYPE = k
+                                TSELECT = False
+                                break
+
+            display.update()
+            Clock.tick(12)
+
+        P.append(Lad(NAME, TYPE, i))
+        cP = i
+        P[i].sayLine(0)
+
+
+    # GAME PHASE
+    GAME = True
+    RESULT = None
+    while GAME:
+        # Draw all relevant assets
         bg.draw()
-        win.blit(sil[i], (340*(1-i), 15))
-
-        win.blit(pBox, (30 + i*414, 30))
-        win.blit(text.render(NAME, True, (0, 0, 0)), (35 + 414*i, 35))
-        win.blit(TEXT.render("SELECT TYPE", True, (0, 0, 0)), (28 + 414 * i, 132))
-        win.blit(TEXT.render("SELECT TYPE", True, (245, 217, 157)), (30 + 414*i, 130))
-
-        for k, j in enumerate(["Businesslad", "College Student", "Bartender", "Scientist", "Artist"]):
-            win.blit(pBox, (30 + i * 414, 270-30*k))
-            win.blit(text.render(j, True, (0, 0, 0)), (40 + i * 414, 277 - 30*k))
+        P[cP].drawCharacter()
+        P[cP].drawOptions()
+        P[cP].drawBar()
+        drawPlayer(1 - cP)
 
         for Event in event.get():
             # Standard quit loop
+            if Event.type == QUIT:
+                quit()
+
+            # Detects click, sends data to Lad objects, and acts on result.
+            # Result data is encoded as follows:
+                # -1 and 1 are standard bad and good results, causing a standard bad or good response;
+                # -2 and 2 are losing and winning results, breaking the loop and moving on to next phase.
+            elif Event.type == MOUSEBUTTONUP:
+                sub = P[cP].checkClick(mouse.get_pos())
+                if sub is not None:
+                    result = P[cP].Compliment(sub)
+                    if result == 1:
+                        P[cP].sayLine(-2)
+                    elif result == -1:
+                        P[cP].sayLine(-1)
+
+                    elif result == 2:
+                        P[cP].sayLine(2)
+                        cP = 1 - cP
+                        P[cP].sayLine(1)
+                        RESULT = (cP + 1, 1)
+                        GAME = False
+                    elif result == -2:
+                        P[cP].sayLine(3)
+                        RESULT = (cP + 1, 2)
+                        GAME = False
+                    cP = 1 - cP
+        display.update()
+        Clock.tick(12)
+
+    # Conclusion section
+    # load images based on result
+    msg = image.load(f'images/win{RESULT[0]}.png')
+    res = image.load(f'images/result{RESULT[1]}.png')
+    # Draws relevant assets, and closes on click
+    OUT = True
+    while OUT:
+        bg.draw()
+        win.blit(msg, (0, 0))
+        win.blit(res, (0, 0))
+        win.blit(btn, (275,270))
+        win.blit(text.render("Play Again", True, (0,0,0)), (278,278))
+
+        for Event in event.get():
             if Event.type == QUIT:
                 quit()
             if Event.type == MOUSEBUTTONUP:
-                mX, mY = mouse.get_pos()
-                print(mX,mY)
-                if 40 + i * 414 < mX < 206 + i * 414:
-                    for k in range(5):
-                        if 266 - 30*k < mY < 290 - 30*k:
-                            TYPE = k
-                            TSELECT = False
-                            break
-
+                mX, mY= mouse.get_pos()
+                if 275<mX<350 and 270<mY<292:
+                    OUT = False
+                    break
+                quit()
         display.update()
         Clock.tick(12)
-
-    P.append(Lad(NAME, TYPE, i))
-    cP = i
-    P[i].sayLine(0)
-
-
-# GAME PHASE
-GAME = True
-RESULT = None
-while GAME:
-    # Draw all relevant assets
-    bg.draw()
-    P[cP].drawCharacter()
-    P[cP].drawOptions()
-    P[cP].drawBar()
-    drawPlayer(1 - cP)
-
-    for Event in event.get():
-        # Standard quit loop
-        if Event.type == QUIT:
-            quit()
-
-        # Detects click, sends data to Lad objects, and acts on result.
-        # Result data is encoded as follows:
-            # -1 and 1 are standard bad and good results, causing a standard bad or good response;
-            # -2 and 2 are losing and winning results, breaking the loop and moving on to next phase.
-        elif Event.type == MOUSEBUTTONUP:
-            sub = P[cP].checkClick(mouse.get_pos())
-            if sub is not None:
-                result = P[cP].Compliment(sub)
-                if result == 1:
-                    P[cP].sayLine(-2)
-                elif result == -1:
-                    P[cP].sayLine(-1)
-
-                elif result == 2:
-                    P[cP].sayLine(2)
-                    cP = 1 - cP
-                    P[cP].sayLine(1)
-                    RESULT = (cP + 1, 1)
-                    GAME = False
-                elif result == -2:
-                    P[cP].sayLine(3)
-                    RESULT = (cP + 1, 2)
-                    GAME = False
-                cP = 1 - cP
-    display.update()
-    Clock.tick(12)
-
-# Conclusion section
-# load images based on result
-msg = image.load(f'images/win{RESULT[0]}.png')
-res = image.load(f'images/result{RESULT[1]}.png')
-# Draws relevant assets, and closes on click
-while True:
-    bg.draw()
-    win.blit(msg, (0, 0))
-    win.blit(res, (0, 0))
-
-    for Event in event.get():
-        if Event.type == QUIT:
-            quit()
-        if Event.type == MOUSEBUTTONUP:
-            quit()
-    display.update()
-    Clock.tick(12)
