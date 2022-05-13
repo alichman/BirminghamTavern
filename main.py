@@ -252,11 +252,6 @@ def drawPlayer(p):
     win.blit(text.render(f'Your turn, Player {p + 1}', True, (0, 0, 0)), (x + 10, 15))
 
 
-ALL_KEYS = {K_a: 'a', K_b: 'b', K_c: 'c', K_d: 'd', K_e: 'e', K_f: 'f', K_g: 'g',
-            K_h: 'h', K_i: 'i', K_j: 'j', K_k: 'k', K_l: 'l', K_m: 'm', K_n: 'n',
-            K_o: 'o', K_p: 'p', K_q: 'q', K_r: 'r', K_s: 's', K_t: 't', K_u: 'u',
-            K_v: 'v', K_w: 'w', K_x: 'x', K_y: 'y', K_z: 'z'}
-
 # Initialize all pygame values, and load images.
 init()
 win = display.set_mode((640, 314))
@@ -282,6 +277,13 @@ f.close()
 f = open('genLines/bad.txt', 'r')
 Bad_Lines = [i for i in f.readlines()]
 f.close()
+
+ALL_KEYS = {K_a: 'a', K_b: 'b', K_c: 'c', K_d: 'd', K_e: 'e', K_f: 'f', K_g: 'g',
+            K_h: 'h', K_i: 'i', K_j: 'j', K_k: 'k', K_l: 'l', K_m: 'm', K_n: 'n',
+            K_o: 'o', K_p: 'p', K_q: 'q', K_r: 'r', K_s: 's', K_t: 't', K_u: 'u',
+            K_v: 'v', K_w: 'w', K_x: 'x', K_y: 'y', K_z: 'z', K_1: '1', K_2: '2',
+            K_3: '3', K_4: '4', K_5: '5', K_6: '6', K_7: '7', K_8: '8', K_9: '9',
+            K_0: '0', K_MINUS: '-', K_UNDERSCORE: '_'}
 
 # MAIN MENU
 
@@ -312,50 +314,70 @@ for i in range(12):
     Clock.tick(12)
 
 # CHAR SELECT PHASE
-sil = image.load('images/sil.png')
+sil = [image.load('images/sil.png'), transform.flip(image.load('images/sil.png'), True, False)]
 P = []
 for i in range(2):
+    # NAME SELECTION
     NAME = ''
-    while True:
+    NSELECT = True
+    while NSELECT:
         bg.draw()
-        win.blit(image.load('images/scientist_1.png'), (320*(1-i), -5))
-        win.blit(pBox, (30 + i*180, 30))
-        win.blit(text.render(NAME,True, (0,0,0)),(35 + i*180, 35))
+        win.blit(sil[i], (340*(1-i), 15))
+        win.blit(pBox, (30 + i*414, 30))
+        win.blit(text.render(NAME,True, (0,0,0)),(35 + i*414, 35))
+        win.blit(TEXT.render("ENTER NAME", True, (0, 0, 0)), (30 + 414 * i, 62))
+        win.blit(TEXT.render("ENTER NAME", True, (245, 217, 157)), (32 + 414 * i, 60))
         for Event in event.get():
             # Standard quit loop
             if Event.type == QUIT:
                 quit()
             if Event.type == KEYDOWN:
                 if Event.key in ALL_KEYS.keys():
-                    NAME += ALL_KEYS[Event.key]
+                    if len(NAME) < 22:
+                        NAME += ALL_KEYS[Event.key]
+                elif Event.key == K_RETURN:
+                    NSELECT = False
+
         display.update()
         Clock.tick(12)
-    while True:
-        bg.draw()
-        win.blit(image.load('images/scientist_1.png'), (320*(1-i), -5))
 
-        win.blit(pBox, (30 + i*180, 30))
-        win.blit(text.render("=Name", True, (0, 0, 0)), (40 + 180*i, 35))
-        win.blit(TEXT.render("SELECT TYPE", True, (0, 0, 0)), (28 + 180 * i, 132))
-        win.blit(TEXT.render("SELECT TYPE", True, (245, 217, 157)), (30 + 180*i, 130))
+    # TYPE SELECTION
+    TYPE = None
+    TSELECT = True
+    while TSELECT:
+        bg.draw()
+        win.blit(sil[i], (340*(1-i), 15))
+
+        win.blit(pBox, (30 + i*414, 30))
+        win.blit(text.render(NAME, True, (0, 0, 0)), (35 + 414*i, 35))
+        win.blit(TEXT.render("SELECT TYPE", True, (0, 0, 0)), (28 + 414 * i, 132))
+        win.blit(TEXT.render("SELECT TYPE", True, (245, 217, 157)), (30 + 414*i, 130))
 
         for k, j in enumerate(["Businesslad", "College Student", "Bartender", "Scientist", "Artist"]):
-            win.blit(pBox, (30 + i * 180, 270-30*k))
-            win.blit(text.render(j, True, (0, 0, 0)), (40 + i * 180, 277 - 30*k))
-
+            win.blit(pBox, (30 + i * 414, 270-30*k))
+            win.blit(text.render(j, True, (0, 0, 0)), (40 + i * 414, 277 - 30*k))
 
         for Event in event.get():
             # Standard quit loop
             if Event.type == QUIT:
                 quit()
+            if Event.type == MOUSEBUTTONUP:
+                mX, mY = mouse.get_pos()
+                print(mX,mY)
+                if 40 + i * 414 < mX < 206 + i * 414:
+                    for k in range(5):
+                        if 266 - 30*k < mY < 290 - 30*k:
+                            TYPE = k
+                            TSELECT = False
+                            break
+
         display.update()
         Clock.tick(12)
 
+    P.append(Lad(NAME, TYPE, i))
+    cP = i
+    P[i].sayLine(0)
 
-cP = 0
-P[0].sayLine(0)
-cP = 1
-P[1].sayLine(0)
 
 # GAME PHASE
 GAME = True
