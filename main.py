@@ -306,18 +306,26 @@ while True:
     for i, j in enumerate(helpText):
         helpText[i] = j.rstrip('\n')
     f.close()
+    f = open('genLines/Locked_Door.txt','r')
+    lockText = f.readlines()
+    flText = lockText[0]
+    lockText.pop(0)
+    f.close()
+    fClick = True
+
     while MENU:
         mn.draw()
         win.blit(hBtn, (0, 0))
+
         if HELP:
             win.blit(Help, (0, 0))
             for num, line in enumerate(helpText):
                 if line[0] == '`':
                     continue
                 if line[0] == '~':
-                    win.blit(TEXT.render(line[1:], True, (48, 27, 0)), (55, 30 + num * 22))
+                    win.blit(TEXT.render(line[1:], True, (66, 44, 1)), (55, 30 + num * 22))
                 else:
-                    win.blit(TExt.render(line, True, (48, 27, 0)), (55, 35 + num * 22))
+                    win.blit(TExt.render(line, True, (66, 44, 1)), (55, 35 + num * 22))
 
         for Event in event.get():
             # Standard quit loop
@@ -332,6 +340,38 @@ while True:
                         MENU = False
                     elif 550 < mouseX < 640 and 18 < mouseY < 56:
                         HELP = True
+                    elif 45 < mouseX < 155 and 120 < mouseY < 310:
+                        step = 0
+                        waitFrame = 0
+                        if fClick:
+                            lockLine = flText
+                        else:
+                            lockLine = random.choice(lockText)
+                        while True:
+                            # Waiting after text is finished
+                            if step is None:
+                                waitFrame += 1
+                                if waitFrame == 24:
+                                    fClick = False
+                                    break
+                            # Draw everything
+                            mn.draw()
+                            win.blit(hBtn, (0, 0))
+                            # Call writeSpeech
+                            step = writeSpeech(lockLine, step, "Door is locked!", (210,250), None)
+
+                            # Standard quit even and Dialog Skip
+                            for Event in event.get():
+                                if Event.type == QUIT:
+                                    quit()
+                                if Event.type == MOUSEBUTTONUP:
+                                    if step is None:
+                                        waitFrame = 23
+                                    else:
+                                        step = None
+
+                            display.update()
+                            Clock.tick(12)
         display.update()
         Clock.tick(12)
 
