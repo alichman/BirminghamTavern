@@ -38,7 +38,7 @@ class Lad:
         if self.kind == 'art_' and self.name == 'Karen':
             self.fileName = f"Characters/art_1.txt"
         else:
-            index = random.randint(1,3)
+            index = random.randint(1, 3)
             if self.side and self.kind == P[0].getChar()[0]:
                 while str(index) == P[0].getChar()[1]:
                     index = random.randint(1, 3)
@@ -65,7 +65,7 @@ class Lad:
 
     def getChar(self):
         toReturn = self.fileName.split('/')[1].split('_')
-        return [toReturn[0]+'_', toReturn[1][:-4]]
+        return [toReturn[0] + '_', toReturn[1][:-4]]
 
     # Clears empty dictionary keys, returns list of remaining keys
     def getOptions(self):
@@ -114,7 +114,7 @@ class Lad:
     def sayLine(self, line, side=None):
         if side is None:
             side = self.side
-    # Line is encoded as follows:
+        # Line is encoded as follows:
         # If line is an int, positive lines are included in the txt file, and negatives are default responses
         # If line is a str, all possible lines are in the designated file in genLines
         if type(line) == int:
@@ -266,6 +266,7 @@ display.set_caption('Birmingham Tavern')
 btn = image.load('images/btn.png')
 bar = image.load('images/bar.png')
 text = font.Font("FONT.ttf", 6)
+TExt = font.Font("FONT.ttf", 8)
 TEXT = font.Font("FONT.ttf", 12)
 box = image.load('images/tBox.png')
 pBox = image.load('images/pBox.png')
@@ -292,19 +293,39 @@ ALL_KEYS = {K_a: 'a', K_b: 'b', K_c: 'c', K_d: 'd', K_e: 'e', K_f: 'f', K_g: 'g'
             K_o: 'o', K_p: 'p', K_q: 'q', K_r: 'r', K_s: 's', K_t: 't', K_u: 'u',
             K_v: 'v', K_w: 'w', K_x: 'x', K_y: 'y', K_z: 'z', K_1: '1', K_2: '2',
             K_3: '3', K_4: '4', K_5: '5', K_6: '6', K_7: '7', K_8: '8', K_9: '9',
-            K_0: '0', K_MINUS: '-', K_UNDERSCORE: '_'}
-
+            K_0: '0', K_MINUS: '-', K_UNDERSCORE: '_', K_SPACE: ' '}
 
 # FULL GAME LOOP -----
 while True:
     # MAIN MENU
     MENU = True
     HELP = False
+
+    f = open('HELP.txt', 'r')
+    helpText = f.readlines()
+    for i, j in enumerate(helpText):
+        helpText[i] = j.rstrip('\n')
+    f.close()
+    f = open('genLines/Locked_Door.txt','r')
+    lockText = f.readlines()
+    flText = lockText[0]
+    lockText.pop(0)
+    f.close()
+    fClick = True
+
     while MENU:
         mn.draw()
-        win.blit(hBtn, (0,0))
+        win.blit(hBtn, (0, 0))
+
         if HELP:
-            win.blit(Help, (0,0))
+            win.blit(Help, (0, 0))
+            for num, line in enumerate(helpText):
+                if line[0] == '`':
+                    continue
+                if line[0] == '~':
+                    win.blit(TEXT.render(line[1:], True, (66, 44, 1)), (55, 30 + num * 22))
+                else:
+                    win.blit(TExt.render(line, True, (66, 44, 1)), (55, 35 + num * 22))
 
         for Event in event.get():
             # Standard quit loop
@@ -315,16 +336,48 @@ while True:
                 if HELP:
                     HELP = False
                 else:
-                    if 400<mouseX<590 and 115<mouseY<310:
+                    if 400 < mouseX < 590 and 115 < mouseY < 310:
                         MENU = False
-                    elif 550<mouseX<640 and 18<mouseY<56:
+                    elif 550 < mouseX < 640 and 18 < mouseY < 56:
                         HELP = True
+                    elif 45 < mouseX < 155 and 120 < mouseY < 310:
+                        step = 0
+                        waitFrame = 0
+                        if fClick:
+                            lockLine = flText
+                        else:
+                            lockLine = random.choice(lockText)
+                        while True:
+                            # Waiting after text is finished
+                            if step is None:
+                                waitFrame += 1
+                                if waitFrame == 24:
+                                    fClick = False
+                                    break
+                            # Draw everything
+                            mn.draw()
+                            win.blit(hBtn, (0, 0))
+                            # Call writeSpeech
+                            step = writeSpeech(lockLine, step, "Door is locked!", (210,250), None)
+
+                            # Standard quit even and Dialog Skip
+                            for Event in event.get():
+                                if Event.type == QUIT:
+                                    quit()
+                                if Event.type == MOUSEBUTTONUP:
+                                    if step is None:
+                                        waitFrame = 23
+                                    else:
+                                        step = None
+
+                            display.update()
+                            Clock.tick(12)
         display.update()
         Clock.tick(12)
 
     # Wait a second
     for i in range(12):
-        win.fill((0,0,0))
+        win.fill((0, 0, 0))
         for Event in event.get():
             # Standard quit loop
             if Event.type == QUIT:
@@ -341,9 +394,9 @@ while True:
         NSELECT = True
         while NSELECT:
             bg.draw()
-            win.blit(sil[i], (340*(1-i), 15))
-            win.blit(pBox, (30 + i*414, 30))
-            win.blit(text.render(NAME,True, (0,0,0)),(35 + i*414, 35))
+            win.blit(sil[i], (340 * (1 - i), 15))
+            win.blit(pBox, (30 + i * 414, 30))
+            win.blit(text.render(NAME, True, (0, 0, 0)), (35 + i * 414, 35))
             win.blit(TEXT.render("ENTER NAME", True, (0, 0, 0)), (30 + 414 * i, 62))
             win.blit(TEXT.render("ENTER NAME", True, (245, 217, 157)), (32 + 414 * i, 60))
             for Event in event.get():
@@ -367,16 +420,16 @@ while True:
         TSELECT = True
         while TSELECT:
             bg.draw()
-            win.blit(sil[i], (340*(1-i), 15))
+            win.blit(sil[i], (340 * (1 - i), 15))
 
-            win.blit(pBox, (30 + i*414, 30))
-            win.blit(text.render(NAME, True, (0, 0, 0)), (35 + 414*i, 35))
+            win.blit(pBox, (30 + i * 414, 30))
+            win.blit(text.render(NAME, True, (0, 0, 0)), (35 + 414 * i, 35))
             win.blit(TEXT.render("SELECT TYPE", True, (0, 0, 0)), (28 + 414 * i, 132))
-            win.blit(TEXT.render("SELECT TYPE", True, (245, 217, 157)), (30 + 414*i, 130))
+            win.blit(TEXT.render("SELECT TYPE", True, (245, 217, 157)), (30 + 414 * i, 130))
 
             for k, j in enumerate(["Businesslad", "College Student", "Bartender", "Scientist", "Artist"]):
-                win.blit(pBox, (30 + i * 414, 270-30*k))
-                win.blit(text.render(j, True, (0, 0, 0)), (40 + i * 414, 277 - 30*k))
+                win.blit(pBox, (30 + i * 414, 270 - 30 * k))
+                win.blit(text.render(j, True, (0, 0, 0)), (40 + i * 414, 277 - 30 * k))
 
             for Event in event.get():
                 # Standard quit loop
@@ -386,7 +439,7 @@ while True:
                     mX, mY = mouse.get_pos()
                     if 40 + i * 414 < mX < 206 + i * 414:
                         for k in range(5):
-                            if 266 - 30*k < mY < 290 - 30*k:
+                            if 266 - 30 * k < mY < 290 - 30 * k:
                                 TYPE = k
                                 TSELECT = False
                                 break
@@ -397,7 +450,6 @@ while True:
         P.append(Lad(NAME, TYPE, i))
         cP = i
         P[i].sayLine(0)
-
 
     # GAME PHASE
     GAME = True
@@ -417,8 +469,8 @@ while True:
 
             # Detects click, sends data to Lad objects, and acts on result.
             # Result data is encoded as follows:
-                # -1 and 1 are standard bad and good results, causing a standard bad or good response;
-                # -2 and 2 are losing and winning results, breaking the loop and moving on to next phase.
+            # -1 and 1 are standard bad and good results, causing a standard bad or good response;
+            # -2 and 2 are losing and winning results, breaking the loop and moving on to next phase.
             elif Event.type == MOUSEBUTTONUP:
                 sub = P[cP].checkClick(mouse.get_pos())
                 if sub is not None:
@@ -452,15 +504,15 @@ while True:
         bg.draw()
         win.blit(msg, (0, 0))
         win.blit(res, (0, 0))
-        win.blit(btn, (275,270))
-        win.blit(text.render("Play Again", True, (0,0,0)), (278,278))
+        win.blit(btn, (275, 270))
+        win.blit(text.render("Play Again", True, (0, 0, 0)), (278, 278))
 
         for Event in event.get():
             if Event.type == QUIT:
                 quit()
             if Event.type == MOUSEBUTTONUP:
-                mX, mY= mouse.get_pos()
-                if 275<mX<350 and 270<mY<292:
+                mX, mY = mouse.get_pos()
+                if 275 < mX < 350 and 270 < mY < 292:
                     OUT = False
                     break
                 quit()
