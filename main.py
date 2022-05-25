@@ -641,7 +641,6 @@ while True:
                             if '$' in SS[ROUND]:
                                 if '$name$' in SS[ROUND]:
                                     SS[ROUND] = SS[ROUND].replace('$name$', NAME)
-                                print(SS[ROUND])
                             P.sayLine(SS[ROUND])
                         else:
                             break
