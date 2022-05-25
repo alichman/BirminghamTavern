@@ -202,8 +202,12 @@ class Lad:
 
 
 class RAUSIC(Lad):
-    def __init(self):
-        Lad.__init__(self, 'R.A.U.S.I.C.', 5, 0)
+    def __init__(self):
+        Lad.__init__(self, 'Strange Robot', 5, 0)
+
+        # TEMPORARY
+        self.fMeter = 50
+
         self.image = image.load("Rausic/rausic.png")
         self.faces = {'happy': image.load('Rausic/happy.png'),
                       'load': image.load('Rausic/load.png'),
@@ -212,12 +216,14 @@ class RAUSIC(Lad):
                       'think': image.load('Rausic/think.png'),
                       'wink': image.load('Rausic/wink.png'),
                       'uwu': image.load('Rausic/uwu.png')}
+        self.cFace = 'happy'
         self.Compliments = ['Intel', 'Personality', 'Health', 'Teeth',
                             'Skill', 'Aspiration', 'Eyes', 'GenVibe',
                             'Creativity', 'Social', 'Wealth', 'Hair']
         random.shuffle(self.Compliments)
         self.Compliments = [self.Compliments[:7], self.Compliments[7:]]
-        self.fPos = [0, 0]
+        self.fPos = [342, 82]
+        self.dir = [1,1]
         f = open('Rausic/good.txt', 'r')
         g = open('Rausic/bad.txt', 'r')
         self.Lines = [f.readlines(), g.readlines()]
@@ -225,16 +231,23 @@ class RAUSIC(Lad):
         g.close()
 
     def drawCharacter(self, face, doBounce, speedx, speedy):
-        win.blit(self.image, (320, -5))
+        win.blit(self.image, (0, 0))
         if doBounce:
-            self.fPos[0] += speedx
-            self.fPos[1] += speedy
-            win.blit(self.faces[face], (self.fPos[0] + 320, self.fPos[1] + 150))
+            self.fPos[0] += speedx * self.dir[0]
+            self.fPos[1] += speedy * self.dir[1]
+            if self.fPos[0]+self.faces[face].get_width() > 612 or self.fPos[0] < 342:
+                if self.fPos[0]+self.faces[face].get_width() < 617 or self.fPos[0] > 347:
+                    self.dir[0] *= -1
+            if self.fPos[1]+self.faces[face].get_height() > 278 or self.fPos[1] < 83:
+                if self.fPos[1]+self.faces[face].get_width() < 283 or self.fPos[1] > 88:
+                    self.dir[1] *= -1
+        win.blit(self.faces[face], tuple(self.fPos))  # B:278+h, T:83, L:342, R:612
 
     def drawBar(self):
-        BARPOS = int(234 * self.fMeter / 100)
-        win.blit(bar, (25, 30))
-        draw.rect(win, (240, 194, 95), Rect(31, 296 - BARPOS, 7, BARPOS))
+        BARPOS = self.fMeter
+        if BARPOS > 100:
+            BARPOS = 100
+        draw.rect(win, (66, 218, 245), Rect(510, 284, BARPOS, 5))
 
     def sayLine(self, line):
         if type(line) == int:
@@ -252,11 +265,11 @@ class RAUSIC(Lad):
                         break
                 # Draw everything
                 bg.draw()
+                self.drawCharacter(self.cFace, True, 5, 5)
                 self.drawBar()
-                self.drawCharacter(True)
 
                 # Call writeSpeech
-                Coord = (100, 260)
+                Coord = (20, 260)
                 step = writeSpeech(Line, step, self.name, Coord, None)
 
                 # Standard quit even and Dialog Skip
@@ -382,9 +395,8 @@ while True:
     f.close()
     f = open('genLines/Locked_Door.txt', 'r')
     lockText = f.readlines()
-    flText = lockText[0]
-    lockText.pop(0)
     f.close()
+    numPresses = 0
     fClick = True
     MODE = 0
 
@@ -418,8 +430,40 @@ while True:
                         MODE = 2
                         MENU = False
                     elif 45 < mouseX < 155 and 120 < mouseY < 310:
-                        MODE = 1
-                        MENU = False
+                        step = 0
+                        waitFrame = 0
+                        if numPresses >= len(lockText):
+                            MODE = 1
+                            MENU = False
+                            break
+                        lockLine = lockText[numPresses]
+                        numPresses += 1
+                        while True:
+                            # Waiting after text is finished
+                            if step is None:
+                                waitFrame += 1
+                                if waitFrame == 24:
+                                    fClick = False
+                                    break
+                            # Draw everything
+                            mn.draw()
+                            win.blit(hBtn, (0, 0))
+                            # Call writeSpeech
+                            step = writeSpeech(lockLine, step, "Door is locked!", (210, 250), None)
+
+                            # Standard quit even and Dialog Skip
+                            for Event in event.get():
+                                if Event.type == QUIT:
+                                    quit()
+                                if Event.type == MOUSEBUTTONUP:
+                                    if step is None:
+                                        waitFrame = 23
+                                    else:
+                                        step = None
+
+                            display.update()
+                            Clock.tick(12)
+
 
         display.update()
         Clock.tick(12)
@@ -501,14 +545,13 @@ while True:
             P.append(Lad(NAME, TYPE, i))
             cP = i
             P[i].sayLine(0)
-        else:
-            P = [RAUSIC(), NAME]
     else:
         P = RAUSIC()
 
     # GAME PHASE
     GAME = True
     RESULT = None
+    # TWO PLAYER SECTION
     if MODE == 2:
         while GAME:
             # Draw all relevant assets
@@ -577,8 +620,9 @@ while True:
 
     # SINGLE PLAYER SECTION
     if MODE == 1:
-        f = open('Script.txt', 'r')
-        g = open('SActions.txt', 'r')
+        NAME = ''
+        f = open('Rausic/Script.txt', 'r')
+        g = open('Rausic/SActions.txt', 'r')
         SS = [i.rstrip('\n') for i in f.readlines()]
         AS = [i.rstrip('\n') for i in g.readlines()]
         f.close()
@@ -587,10 +631,54 @@ while True:
         ROUND = -1
 
         for cmd in AS:
-            if cmd == 'speak':
-                while True:
-                    ROUND += 1
-                    if SS[ROUND] != '-':
-                        P.sayLine(SS[ROUND])
-                    else:
-                        break
+            CMD = cmd.split('|')
+            while CMD:
+                if CMD[0] == 'speak':
+
+                    while True:
+                        ROUND += 1
+                        if SS[ROUND] != '-':
+                            if '$' in SS[ROUND]:
+                                if '$name$' in SS[ROUND]:
+                                    SS[ROUND] = SS[ROUND].replace('$name$', NAME)
+                                print(SS[ROUND])
+                            P.sayLine(SS[ROUND])
+                        else:
+                            break
+                # Changing Face
+                elif CMD[0] == 'f':
+                    P.cFace = CMD[1]
+                    CMD.pop(0)
+                # Name Change
+                elif CMD[0] == 'n':
+                    P.name = CMD[1]
+                    CMD.pop(0)
+
+                # Get name:
+                elif CMD[0] == 'getName':
+                    NSELECT = True
+                    while NSELECT:
+                        bg.draw()
+                        P.drawCharacter(P.cFace, True, 3, 3)
+                        win.blit(pBox, (30, 30))
+                        win.blit(text.render(NAME, True, (0, 0, 0)), (35, 35))
+                        win.blit(TEXT.render("ENTER NAME", True, (0, 0, 0)), (30, 62))
+                        win.blit(TEXT.render("ENTER NAME", True, (245, 217, 157)), (32, 60))
+                        for Event in event.get():
+                            # Standard quit loop
+                            if Event.type == QUIT:
+                                quit()
+                            if Event.type == KEYDOWN:
+                                if Event.key in ALL_KEYS.keys():
+                                    speak.play()
+                                    if len(NAME) < 22:
+                                        NAME += ALL_KEYS[Event.key]
+                                elif Event.key == K_RETURN:
+                                    NSELECT = False
+                                elif Event.key == K_BACKSPACE:
+                                    NAME = NAME[:-1]
+
+                        display.update()
+                        Clock.tick(12)
+
+                CMD.pop(0)

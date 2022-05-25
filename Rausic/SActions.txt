@@ -1,1 +1,6 @@
-speak
+speak|
+f|wink|speak
+f|uwu|n|R.A.U.S.I.C.|speak
+f|think|speak
+f|happy|speak
+getName|speak
