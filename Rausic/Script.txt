@@ -13,5 +13,9 @@ I've been studying humans since my~ creation! And that was a long time ago!~ I k
 But enough about me, what's your name?~~
 -
 Nice to meet you, $name$.~ I can't wait to help you be the best you!~
-Alright then, lets. begin.~~
+Alright then, lets begin.~~
+-
+loading...~ loading...~loading...
+-
+Done!~ I just generated a character for you to~ talk to!
 -

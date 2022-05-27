@@ -224,24 +224,31 @@ class RAUSIC(Lad):
         self.Compliments = [self.Compliments[:7], self.Compliments[7:]]
         self.fPos = [342, 82]
         self.dir = [1,1]
+        self.speed = [3,3]
+        self.bounce = True
         f = open('Rausic/good.txt', 'r')
         g = open('Rausic/bad.txt', 'r')
         self.Lines = [f.readlines(), g.readlines()]
         f.close()
         g.close()
 
-    def drawCharacter(self, face, doBounce, speedx, speedy):
+    def drawCharacter(self, face, doBounce, speed):
         win.blit(self.image, (0, 0))
         if doBounce:
-            self.fPos[0] += speedx * self.dir[0]
-            self.fPos[1] += speedy * self.dir[1]
+            self.fPos[0] += speed[0] * self.dir[0]
+            self.fPos[1] += speed[1] * self.dir[1]
             if self.fPos[0]+self.faces[face].get_width() > 612 or self.fPos[0] < 342:
                 if self.fPos[0]+self.faces[face].get_width() < 617 or self.fPos[0] > 347:
                     self.dir[0] *= -1
             if self.fPos[1]+self.faces[face].get_height() > 278 or self.fPos[1] < 83:
                 if self.fPos[1]+self.faces[face].get_width() < 283 or self.fPos[1] > 88:
                     self.dir[1] *= -1
-        win.blit(self.faces[face], tuple(self.fPos))  # B:278+h, T:83, L:342, R:612
+            win.blit(self.faces[face], tuple(self.fPos))  # B:278+h, T:83, L:342, R:612
+        if face == 'load':
+            self.fPos = [455, 180]
+            for i in range(bg.frame//8 + 1):
+                win.blit(self.faces[face], (self.fPos[0]+i*30, self.fPos[1]))
+
 
     def drawBar(self):
         BARPOS = self.fMeter
@@ -265,7 +272,7 @@ class RAUSIC(Lad):
                         break
                 # Draw everything
                 bg.draw()
-                self.drawCharacter(self.cFace, True, 5, 5)
+                self.drawCharacter(self.cFace, self.bounce, self.speed)
                 self.drawBar()
 
                 # Call writeSpeech
@@ -634,7 +641,6 @@ while True:
             CMD = cmd.split('|')
             while CMD:
                 if CMD[0] == 'speak':
-
                     while True:
                         ROUND += 1
                         if SS[ROUND] != '-':
@@ -652,13 +658,21 @@ while True:
                 elif CMD[0] == 'n':
                     P.name = CMD[1]
                     CMD.pop(0)
-
+                # Speed Change
+                elif CMD[0] == 's':
+                    P.speed = int(CMD[1],CMD[1])
+                    CMD.pop(0)
+                # Bounce Change
+                elif CMD[0] == 'b':
+                    P.bounce = bool(int(CMD[1]))
+                    print(P.bounce)
+                    CMD.pop(0)
                 # Get name:
                 elif CMD[0] == 'getName':
                     NSELECT = True
                     while NSELECT:
                         bg.draw()
-                        P.drawCharacter(P.cFace, True, 3, 3)
+                        P.drawCharacter(P.cFace, True, (3,3))
                         win.blit(pBox, (30, 30))
                         win.blit(text.render(NAME, True, (0, 0, 0)), (35, 35))
                         win.blit(TEXT.render("ENTER NAME", True, (0, 0, 0)), (30, 62))
